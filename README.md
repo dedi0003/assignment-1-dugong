@@ -1,11 +1,11 @@
 # ETC5521 Assignment 1 
 
-Team name: [FILL]
+Team name: [dugong]
 
 Team members:
 
-* [FILL]
-* [FILL]
+* [Yezi He]
+* [Abhishek Sinha]
 
 # Steps
 
