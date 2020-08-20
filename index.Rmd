@@ -17,6 +17,8 @@ output:
 
 [FILL] Give the bigger picture of the data, and inspire the reader to learn more about the problem by reading your analysis. 
 
+In our study, we want to figure out what factors can affect House Price Index (HPI) and how they affect HPI. We get the final answer by analyzing three questions. The first is the relationship between mortgage rates and HPI. The second question is whether the recession affected HPI. The third question is whether the HPI value of the state is related to the HPI value of the country.
+
 # Data description
 
 House and Mortgage Data consists of three separate data tables from different sources. These tables are:
