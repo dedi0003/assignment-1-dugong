@@ -1,10 +1,10 @@
 ---
 title: "ETC5521 Assignment 1"
-subtitle: "Your title"
-team: [FILL]
+subtitle: "House and Mortgage Data"
+team: Dugong
 author:
-  - [FILL]
-  - [FILL]
+  - Abhishek Sinha
+  - Yezi He
 date: "`r Sys.Date()`"
 output: 
   html_document
@@ -18,6 +18,43 @@ output:
 [FILL] Give the bigger picture of the data, and inspire the reader to learn more about the problem by reading your analysis. 
 
 # Data description
+
+House and Mortgage Data consists of three separate data tables from different sources. These tables are:
+
+1. **House Price Index**: The data for House Price Index (HPI) has been originally taken from ‘Freddie Mac’ website (http://www.freddiemac.com/research/indices/house-price-index.page). The raw data is then further modified to include 26,877 observations and 5 variables. These variables are:  
+
+**Year**: A date-integer type variable with year information.  
+**Month**: A date-integer type variable with months information.  
+**State**: A character data type variable with US state’s abbreviations.  
+**price_index**: A double data type variable with the calculated values for HPI at state level.  
+**us_avg**: A double data type variable with the calculated values for HPI at national level.  
+
+This dataset has been maintained by Freddie Mac from January’1975 onwards. This particular dataset has data till November’2018 and is a monthly data for every US state with calculated values for HPI at State level & national level. The price_index at state level and national level is calculated using a repeat-transactions methodology. For calculating HPI, Freddie Mac uses a dataset that includes valuation and location data for the combined portfolio of loans that were purchased by either Freddie Mac or Fannie Mae since January 1975. This dataset is updated monthly with new purchases from the two firms.
+
+2.	**Mortgage Rates**: The data for Mortgage Rates has been taken from Freddie Mac’ website (http://www.freddiemac.com/pmms/). The dataset consists of 2492 observations and 9 variables. These variables are:  
+
+**Date**: A date type variable with dates.  
+**Fixed_rate_30_yr**: A double datatype with 30-year fixed rate mortgage in percent  
+**Fees_and_pts_30_yr**: A double datatype with fees and percentage points of the loan amount  
+**Fixed_rate_15_yr**: A double datatype with 15-year fixed rate mortgage in percent  
+**Fees_and_pts_15_yr**: A double datatype with fees and percentage points of the loan amount  
+**Adjustable_rate_5_1_hybrid**: A double datatype with adjustable mortgage rate based on 5-1 hybrid i.e. 5 year fixed, then annual adjustable rate.  
+**Fees_and_pts_5_1_hybrid**: A double datatype with fees and percentage points of the loan amount  
+**Adjustable_margin_5_1_hybrid**: A double datatype variable. This variable represents a full index rate for an ARM with a fixed amount added to the initial index.  
+**Spread_30_yr_fixed_and_5_1_adjustable**: A double datatype with difference between 30-year fixed rate and 5-1 adjustable rate  
+
+This dataset has been maintained by Freddie Mac from April’1971 onwards. Freddie Mac has surveyed lenders across the nation weekly to determine the average 30-year fixed-rate mortgage rate; in 1984, the 1-year ARM was added to the survey and the 15-year fixed-rate mortgage rate was included beginning in 1991. In January 2005, Freddie Mac added a 5/1 hybrid ARM series to the survey. Survey reminder emails are sent out on Mondays and lenders are asked to respond by close of business Wednesday. 
+
+3.	**Recession Dates**: The final dataset is a dataset created with information on major recession periods in US like the Great Recession in 2007. These events had some major effects across many industries and markets and are an important factor in analysing the house prices overtime. The information has been scrapped from Wikipedia (https://en.wikipedia.org/wiki/List_of_recessions_in_the_United_States).
+The dataset consists of 14 observations of 7 variables. These variables are:  
+
+**Name**: A character datatype variable with recession names.  
+**Period_range**: A character datatype variable defining the range or period of the recession.  
+**Duration_months**: A character datatype variable with recession period in months.  
+**Time_since_previous_recession_months**: A character datatype variable with information about time since previous recession in months.  
+**Peak_unemploy_ment**:  A character datatype variable with information on the peak unemployment in percent.  
+**Gdp_decline_peak_to_trough**: A character datatype variable that defines the GDP decline from peak.  
+**Characteristics**: A character datatype variable that give a description about the recession.  
 
 # Analysis and findings
 
