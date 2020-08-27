@@ -132,14 +132,14 @@ p1_hpi_mort
 
 Also we build a rlm model to find their relationship, but it seems not fit very well. It may because the high value of mortgage rates.
 
-```{r lm}
+```{r rlm}
 hpi_mort <- merge(nation_hpi, mortgage_rates_month, by = c("year","month")) %>%
   arrange(date) %>%
   dplyr::select(-year, -month)
 hpi_mort %>% 
   ggplot(aes(`mortgage rates`, us_avg)) +
   geom_point() +
-  geom_smooth(method = "lm", se = FALSE) +
+  geom_smooth(method = "rlm", se = FALSE) +
   ggtitle("Robust linear model for mortgage rate and HPI")
 hpi_mort_rlm <- rlm(us_avg ~ lag(`mortgage rates`), data = hpi_mort)
 summary(hpi_mort_rlm)
@@ -148,8 +148,10 @@ summary(hpi_mort_rlm)
 ## Recession
 
 ```{r recession-wrangle}
+# modify typical value of recession_dates
 recession_dates$period_range[1] <- "1929Aug 1929-Mar 1933"
 recession_dates$period_range[14] <- "2007Dec 2007-June 2009"
+# mutate "from" and "to" columns
 recession_dates1 <- recession_dates  %>% 
   mutate(from_c = word(recession_dates$period_range,1,1,sep = "-"), 
          to_c = word(recession_dates$period_range,2,2,sep = "-")) %>%
@@ -187,13 +189,52 @@ p3_mortgage_recession
 ```
 
 
-## States and Nation
+## States and the Nation
 
-```{r}
-state_hpi %>%
+```{r national-diff}
+# the difference of national HPI
+national_diff <- max(nation_hpi$us_avg)-min(nation_hpi$us_avg)
+```
+
+We have calculated the difference of national maximun HPI and national minimun HPI, which is `r round(national_diff)`. And then we find the states whose differences are 1.25 times the national HPI difference as below. In the following analysis we will focus on these four states.
+
+```{r difference}
+# filter the states whose differences are 1.25 times the national HPI difference
+state_hpi_diff <- state_hpi %>%
+  group_by(state) %>%
+  mutate(max = max(price_index),
+         min = min(price_index),
+         difference = max-min) %>%
+  filter(difference > national_diff*1.25)
+# show them by a kable
+distinct(state_hpi_diff,state,difference) %>%
+  arrange(difference) %>%
+  kable() %>%
+  kable_styling(bootstrap_options = "basic", position = "center")
+```
+
+
+```{r state-hpi}
+state_hpi1 <- state_hpi%>%
+  filter(state %in% c("WA","CA","HI","DC"))
+  
+state_hpi1 %>%  
   ggplot() +
-  geom_line(aes(date,price_index,group = state))+
-  facet_wrap( ~ state)
+  geom_line(aes(date,price_index,group = state)) +
+  facet_wrap( ~ state) +
+  xlab("Date") +
+  ylab("State HPI") +
+  ggtitle("HPI of four states")
+  
+
+state_hpi1 %>% 
+  ggplot(aes(price_index, us_avg)) +
+  geom_point() +
+  facet_wrap( ~ state) +
+  geom_smooth(method = "lm", se = FALSE) +
+  xlab("States HPI") +
+  ylab("US Average HPI")
+  ggtitle("Linear model for state HPI and national HPI")
 ```
 
 
