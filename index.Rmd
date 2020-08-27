@@ -63,14 +63,14 @@ The dataset consists of 14 observations of 7 variables. These variables are:
 [FILL] Should include at least one plot or numerical summary for each of your questions, that helps the reader arrive at an answer. You should also write paragraphs describing the methods, summaries and findings. 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE,message = FALSE)
+knitr::opts_chunk$set(echo = FALSE,warning = FALSE,message = FALSE)
 library(tidyverse)
 library(scales)
 library(lubridate)
 library(broom)
 library(MASS)
+library(stringr)
 library(kableExtra)
-library(patchwork)
 ```
 
 ```{r read-data}
@@ -109,7 +109,8 @@ hpi_date <- nation_hpi %>%
   ggplot(aes(date, us_avg)) +
   geom_line(color = "green") +
   xlab("Date") +
-  ylab("US Average HPI")
+  ylab("US Average HPI") +
+  ggtitle("US Average HPI")
 hpi_date
 ```
 
@@ -123,6 +124,7 @@ p1_hpi_mort <- ggplot()+
   geom_line(data=nation_hpi, aes(x=date, y=us_avg), color="green")+
   scale_y_continuous(sec.axis = sec_axis(~ . *0.1, name = "Mortgage Rates"))+
   scale_x_date(labels = date_format("%Y"), breaks = date_breaks("10 year")) +
+  xlim(ymd(19750101), NA) +
   labs(x="Date", y="US Average HPI") +
   ggtitle("HPI vs. Mortgage rates")
 p1_hpi_mort
@@ -137,12 +139,62 @@ hpi_mort <- merge(nation_hpi, mortgage_rates_month, by = c("year","month")) %>%
 hpi_mort %>% 
   ggplot(aes(`mortgage rates`, us_avg)) +
   geom_point() +
-  geom_smooth(method = "lm", se = FALSE)
+  geom_smooth(method = "lm", se = FALSE) +
+  ggtitle("Robust linear model for mortgage rate and HPI")
 hpi_mort_rlm <- rlm(us_avg ~ lag(`mortgage rates`), data = hpi_mort)
 summary(hpi_mort_rlm)
 ```
 
 ## Recession
+
+```{r recession-wrangle}
+recession_dates$period_range[1] <- "1929Aug 1929-Mar 1933"
+recession_dates$period_range[14] <- "2007Dec 2007-June 2009"
+recession_dates1 <- recession_dates  %>% 
+  mutate(from_c = word(recession_dates$period_range,1,1,sep = "-"), 
+         to_c = word(recession_dates$period_range,2,2,sep = "-")) %>%
+     mutate(from_c = substring(from_c,5))   %>%
+  mutate(from = as.Date(parse_date_time(from_c, "%b %Y")), 
+         to = as.Date(parse_date_time(to_c, "%b %Y"))) %>%
+  dplyr::select("name", "from","to") 
+```
+
+```{r recession-kable}
+kable(recession_dates1) %>%
+  kable_styling(bootstrap_options = "basic", position = "center")
+```
+
+```{r p2-hpi-recession}
+p2_hpi_recession <- nation_hpi %>% 
+  ggplot() +
+  geom_line(aes(date, us_avg), color = "green") +
+  geom_rect(data = recession_dates1, aes(xmin = from, xmax = to, ymin = -Inf, ymax = Inf), alpha = 0.25, fill = "blue") +
+  xlim(ymd(19750101), NA) +
+  ylab("US Average HPI") +
+  xlab("Date") +
+  ggtitle("Recession and US Average HPI")
+p2_hpi_recession
+```
+
+If we add the mortgage rates on this plot, it is clear that 1980 Recession and 1981-1982 Recession have a strong connection to the mortgage rates in this period.
+
+```{r p3_mortgage_recession}
+p3_mortgage_recession <- p1_hpi_mort +
+  geom_rect(data = recession_dates1, aes(xmin = from, xmax = to, ymin = -Inf, ymax = Inf), alpha = 0.25, fill = "blue") +
+  ggtitle("Recession, HPI and Mortgage Rates")
+
+p3_mortgage_recession
+```
+
+
+## States and Nation
+
+```{r}
+state_hpi %>%
+  ggplot() +
+  geom_line(aes(date,price_index,group = state))+
+  facet_wrap( ~ state)
+```
 
 
 
