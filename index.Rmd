@@ -17,7 +17,7 @@ output:
 
 [FILL] Give the bigger picture of the data, and inspire the reader to learn more about the problem by reading your analysis. 
 
-In our study, we want to figure out what factors can affect House Price Index (HPI) and how they affect HPI. We get the final answer by analyzing three questions. The first is the relationship between mortgage rates and HPI. The second question is whether the recession affected HPI. The third question is whether the HPI value of the state is related to the HPI value of the country.
+In our study, we want to figure out what factors can affect House Price Index (HPI) and how they affect HPI. We get the final answer by analyzing three questions. The first is the relationship between mortgage rates and HPI. The second question is how the recession affected HPI. The third question is how the HPI value of the state is related to the HPI value of the country.
 
 # Data description
 
@@ -61,5 +61,89 @@ The dataset consists of 14 observations of 7 variables. These variables are:
 # Analysis and findings
 
 [FILL] Should include at least one plot or numerical summary for each of your questions, that helps the reader arrive at an answer. You should also write paragraphs describing the methods, summaries and findings. 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,message = FALSE)
+library(tidyverse)
+library(scales)
+library(lubridate)
+library(broom)
+library(MASS)
+library(kableExtra)
+library(patchwork)
+```
+
+```{r read-data}
+state_hpi <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-02-05/state_hpi.csv")
+mortgage_rates <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-02-05/mortgage.csv")
+recession_dates <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-02-05/recessions.csv")
+
+```
+
+```{r wrangle}
+mortgage_rates <-  mortgage_rates %>%
+  dplyr::select("date","fixed_rate_30_yr")
+
+mortgage_rates_month <-  mortgage_rates %>%
+  mutate(year = year(date), month = month(date)) %>%
+  dplyr::select("date","year","month","fixed_rate_30_yr") %>%
+  group_by(year,month) %>%
+  summarise("mortgage rates" = mean(fixed_rate_30_yr))
+
+state_hpi <- state_hpi %>% 
+  mutate(date = ymd(year*10000+month*100+1)) 
+
+nation_hpi <- state_hpi %>%
+  dplyr::select("date","year","month","us_avg") %>%
+  distinct()
+```
+
+## National HPI
+
+Generally, the trend of United States national HPI is showen below. 
+
+
+```{r hpi-date}
+# how to show the peak of this graph
+hpi_date <- nation_hpi %>%
+  ggplot(aes(date, us_avg)) +
+  geom_line(color = "green") +
+  xlab("Date") +
+  ylab("US Average HPI")
+hpi_date
+```
+
+## Mortgage
+
+As the plot shows below the mortgage rates and US national HPI. There seems no significant relationship. But when the HPI or mortgage rates are very high, the another one will decline.
+
+```{r p1-hpi-mort}
+p1_hpi_mort <- ggplot()+ 
+  geom_line(data=mortgage_rates, aes(x=date, y=fixed_rate_30_yr*10), color="red") +
+  geom_line(data=nation_hpi, aes(x=date, y=us_avg), color="green")+
+  scale_y_continuous(sec.axis = sec_axis(~ . *0.1, name = "Mortgage Rates"))+
+  scale_x_date(labels = date_format("%Y"), breaks = date_breaks("10 year")) +
+  labs(x="Date", y="US Average HPI") +
+  ggtitle("HPI vs. Mortgage rates")
+p1_hpi_mort
+```
+
+Also we build a rlm model to find their relationship, but it seems not fit very well. It may because the high value of mortgage rates.
+
+```{r lm}
+hpi_mort <- merge(nation_hpi, mortgage_rates_month, by = c("year","month")) %>%
+  arrange(date) %>%
+  dplyr::select(-year, -month)
+hpi_mort %>% 
+  ggplot(aes(`mortgage rates`, us_avg)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+hpi_mort_rlm <- rlm(us_avg ~ lag(`mortgage rates`), data = hpi_mort)
+summary(hpi_mort_rlm)
+```
+
+## Recession
+
+
 
 # References
