@@ -15,9 +15,13 @@ output:
 
 # Introduction and motivation
 
-[FILL] Give the bigger picture of the data, and inspire the reader to learn more about the problem by reading your analysis. 
+House Price Index (HPI) is a broad measure to understand the movement of the single-family house prices across a designated market. HPI provides housing economists with an improved analytical tool that is useful for estimating changes in the rates of mortgage defaults, prepayments and housing affordability in specific geographic areas. Economists and Fund Managers often use HPI to analyse long term trends in consumer behaviour and financial situation of the country. It is for this exact reason currency investors keep a watch on HPI along with Consumer Price Index (CPI), Gross Domestic Product (GDP) and unemployment figures. Experts say that HPI can predict inflation. With proper lender assistance, HPIs can also help you decide if it’s a good time to purchase a new home. 
 
-In our study, we want to figure out what factors can affect House Price Index (HPI) and how they affect HPI. We get the final answer by analyzing three questions. The first is the relationship between mortgage rates and HPI. The second question is how the recession affected HPI. The third question is how the HPI value of the state is related to the HPI value of the country.
+The housing market represents about 15 percent to 18 percent of U.S. GDP, which means a weak or strong housing market can have substantial influence on the direction of the overall economy. This makes HPI even more important to track and use in analysis. 
+
+The motivation of this report is to analyse the House Price Index in the U.S. overtime and also detailed it down to some prominent states. The report will also analyse the effect of the external factors like recession and mortgage rates on HPI. 
+
+At present, the House Price Index is a relatively less known economic indicator which is soon gaining popularity among economists. Although this report is limited to establish HPI’s as an alternative economic factor to understand recession and its relation with mortgage rates, analysing HPI in greater detail will allow for more informative view of the state of an economy and HPI’s relation with other factors like Currency fluctuation and GDP. As the strength of housing market also dictates the state of the workforce involved in this sector, relating HPI with population and workforce data will provide another interesting relation to analyse and predict the state of workforce and income during recessions.
 
 # Data description
 
@@ -59,6 +63,8 @@ The dataset consists of 14 observations of 7 variables. These variables are:
 **Characteristics**: A character datatype variable that give a description about the recession.  
 
 # Analysis and findings
+
+In our study, we want to figure out what factors can affect House Price Index (HPI) and how they affect HPI. We get the final answer by analyzing three questions. The first is the relationship between mortgage rates and HPI. The second question is how the recession affected HPI. The third question is how the HPI value of the state is related to the HPI value of the country.
 
 [FILL] Should include at least one plot or numerical summary for each of your questions, that helps the reader arrive at an answer. You should also write paragraphs describing the methods, summaries and findings. 
 
