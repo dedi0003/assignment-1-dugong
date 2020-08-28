@@ -194,11 +194,11 @@ hpi_date <- nation_hpi %>%
 ggplotly(hpi_date)
 ```
 
-From Figure 1, we can look at the U.S. Average HPI from 1975 onwards and we noticed that HPI has shown a positive growth overtime. This means that the prices of single houses is increasing inspite of recessions. There is a gradual increase in the HPI values in the U.S. till 2000, which is followed by a period of relatively fast increase in the HPI. This can be explain by the concept of Housing Bubble. The U.S. experienced a major housing bubble in the 2000s caused by inflows of money into housing markets, loose lending conditions, and government policy to promote home-ownership. This temporary bubble came crashing down in 2007 with the start of the great recession which saw HPI values nose dive. As the economy started to rise again in 2011 we see the HPI values rise again. This coorrelation between HPI and economy only reaffirms the effectivness of HPI as an economic factor. 
+From Figure 1, we can look at the U.S. Average HPI from 1975 onwards and we noticed that HPI has shown a positive growth overtime. This means that the prices of single houses is increasing inspite of recessions. There is a gradual increase in the HPI values in the U.S. till 2000, which is followed by a period of relatively fast increase in the HPI. This can be explain by the concept of Housing Bubble. The U.S. experienced a major housing bubble in the 2000s caused by inflows of money into housing markets, loose lending conditions, and government policy to promote home-ownership. This temporary bubble came crashing down in 2007 with the start of the great recession which saw HPI values nose dive. As the economy started to rise again in 2011 we see the HPI values rise again. This correlation between HPI and economy only reaffirms the effectiveness of HPI as an economic factor. 
 
 ## National vs. State HPI
 
-The first sub question we look at is the relation between national HPI and state HPI. As the national HPI is driven by the states it becomes important to look at which states are the driving force behind it and which states are struggling. To analyse the HPI values across all 51 states is quite an arduous approach. This propmted an idea to instead look at the regions and compare it with national values. To do that we use a built in R dataset as mentioned in GIT which contains U.S. states information.
+The first sub question we look at is the relation between national HPI and state HPI. As the national HPI is driven by the states it becomes important to look at which states are the driving force behind it and which states are struggling. To analyse the HPI values across all 51 states is quite an arduous approach. This prompted an idea to instead look at the regions and compare it with national values. To do that we use a built in R dataset as mentioned in GIT which contains U.S. states information.
 
 ```{r region-wise, fig.cap="Figure 2"}
 state_abb <- as.data.frame(state.abb)
@@ -224,13 +224,13 @@ p1 <- state_data_hpi %>%
 ggplotly(p1)
 ```
 
-From Figure 2, we can look at the four regions across the U.S. and how the HPI values at state level behaves w.r.t national level. We can notice that the West and Northeast regions are relatively on the same path as national HPI. These are the two regions which have states with strong economies and higher population because of the tech industries. States like California in West and New York or Conneticut in Northeast are some examples of that. 
+From Figure 2, we can look at the four regions across the U.S. and how the HPI values at state level behaves w.r.t national level. We can notice that the West and Northeast regions are relatively on the same path as national HPI. These are the two regions which have states with strong economies and higher population because of the tech industries. States like California in West and New York or Connecticut in Northeast are some examples of that. For Regions like South and North Central which are comparatively smaller economies and less populated we noticed that they also witnessed a gradual increase in HPI but the effect of housing bubble and great recession was less drastic. This shows that the effect of factors like recession and economics varies around states and thus cannot be explain by one single national HPI. 
 
 ## Effect of Mortgage Rates on HPI
 
-As the plot shows below the mortgage rates and US national HPI. There seems no significant relationship. But when the HPI or mortgage rates are very high, the another one will decline.
+The second sub question looks at the effect of Mortgage rates on HPI. Mortgage rates and HPI are two separate entities which are caluclated on different parameters but their relation can give interesting insights. For our analysis we focus on the *'Fixed 30 year rate'* mortgage as this is more popular and has been from begninning to offer complete picture.
 
-```{r p1-hpi-mort}
+```{r p1-hpi-mort, fig.cap="Figure 3"}
 p1_hpi_mort <- ggplot()+ 
   geom_line(data=mortgage_rates, aes(x=date, y=fixed_rate_30_yr*10), color="red") +
   geom_line(data=nation_hpi, aes(x=date, y=us_avg), color="green")+
@@ -239,23 +239,34 @@ p1_hpi_mort <- ggplot()+
   xlim(ymd(19750101), NA) +
   labs(x="Date", y="US Average HPI") +
   ggtitle("HPI vs. Mortgage rates")
-p1_hpi_mort
+ggplotly(p1_hpi_mort)
 ```
 
-Also we build a rlm model to find their relationship, but it seems not fit very well. It may because the high value of mortgage rates.
+Looking at Figure 3 we can notice that as the House Price Index increased overtime, surprisingly mortgage rates have come crashing down. This means that banks and lenders like Freddie Mac are offering housing loans at lower interest rates ever. As people buy homes using mortgages most of the time, this means that financing houses has become easier. This indicates that the bank has enough reserves to dish out mortgage loans at such low rates. It ultimately means the economy has an actively circulating wealth in the system. Thus it can clearly said that mortgage rates have less impact on the HPI values.
 
-```{r rlm}
+To further stem this finding we try to build a rlm model to verify the relationship.
+
+```{r rlm, fig.cap="Figure 4}
 hpi_mort <- merge(nation_hpi, mortgage_rates_month, by = c("year","month")) %>%
   arrange(date) %>%
   dplyr::select(-year, -month)
-hpi_mort %>% 
+set.seed(2020)
+p2 <- hpi_mort %>% 
   ggplot(aes(`mortgage rates`, us_avg)) +
   geom_point() +
-  geom_smooth(method = "rlm", se = FALSE) +
-  ggtitle("Robust linear model for mortgage rate and HPI")
-hpi_mort_rlm <- rlm(us_avg ~ lag(`mortgage rates`), data = hpi_mort)
-summary(hpi_mort_rlm)
+  geom_smooth(method = "lm", se = FALSE) +
+  ylab("US Average HPI") +
+  ggtitle("Linear model for mortgage rate and HPI")
+
+ggplotly(p2)
 ```
+
+```{r hpi-mort-lm}
+hpi_mort_lm <- lm(us_avg ~ lag(`mortgage rates`), data = hpi_mort)
+summary(hpi_mort_lm)
+```
+
+Amalyzing at the summary statistics of the model, the slope in our model is -11.034, which indicates that for every 1 unit increase in the mortgage rate, the US Average HPI decreases by 11.034. An adjusted R-squared of 62.73% indicates the model is fitting the data well, and roughly 62.73% of the variance found in the response variable (US average HPI) can be explained by the mortgage rates. p-value of 2.2e-16 which is less than 0.01 represents that this model is significant on the 0.1% level.
 
 ## Effect of Recession on HPI
 
