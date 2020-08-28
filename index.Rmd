@@ -133,26 +133,12 @@ data_mortage %>%
 
 ### Recession Data
 
-```{r read-recession-data, warning=FALSE, message=FALSE, echo=FALSE}
-url <- "https://en.wikipedia.org/wiki/List_of_recessions_in_the_United_States"
+```{r read-recession-data, echo=TRUE}
+recession_dates <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-02-05/recessions.csv")
 
-df3 <- url %>% 
-  read_html() %>% 
-  html_table() %>% 
-  .[[3]] %>% 
-  janitor::clean_names()
-
-recession_data <- df3 %>% 
-  mutate(duration_months = substring(duration_months, 3),
-         period_range = substring(period_range, 5),
-         time_since_previous_recession_months = substring(time_since_previous_recession_months, 4),
-         period_range = case_when(name == "Great Depression" ~ "Aug 1929-Mar 1933",
-                                  name == "Great Recession" ~ "Dec 2007-June 2009",
-                                  TRUE ~ period_range))
-
-recession_data %>% 
+recession_dates %>% 
   head(1) %>% 
-  kable(caption = "Recession Dataset") %>% 
+  kable(caption = "Recession Data") %>% 
   kable_styling(bootstrap_options = c("striped", "hover"))
 ```
 
@@ -246,7 +232,7 @@ Looking at Figure 3 we can notice that as the House Price Index increased overti
 
 To further stem this finding we try to build a rlm model to verify the relationship.
 
-```{r rlm, fig.cap="Figure 4}
+```{r rlm, fig.cap="Figure 4"}
 hpi_mort <- merge(nation_hpi, mortgage_rates_month, by = c("year","month")) %>%
   arrange(date) %>%
   dplyr::select(-year, -month)
@@ -270,6 +256,8 @@ Amalyzing at the summary statistics of the model, the slope in our model is -11.
 
 ## Effect of Recession on HPI
 
+The third sub question is to analyze the effect of recession on HPI values. Analyzing the effect of recession on HPI using economic data is outside the scope of this report, but the data scripted from Wikipedia allows us to look at the behaviour of HPI during the period of recession.
+
 ```{r recession-wrangle}
 # modify typical value of recession_dates
 recession_dates$period_range[1] <- "1929Aug 1929-Mar 1933"
@@ -285,11 +273,12 @@ recession_dates1 <- recession_dates  %>%
 ```
 
 ```{r recession-kable}
-kable(recession_dates1) %>%
-  kable_styling(bootstrap_options = "basic", position = "center")
+recession_dates1 %>%
+  kable(caption = "Cleaned Recession Data") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover"))
 ```
 
-```{r p2-hpi-recession}
+```{r p2-hpi-recession, fig.cap="Figure 5"}
 p2_hpi_recession <- nation_hpi %>% 
   ggplot() +
   geom_line(aes(date, us_avg), color = "green") +
@@ -301,9 +290,9 @@ p2_hpi_recession <- nation_hpi %>%
 p2_hpi_recession
 ```
 
-If we add the mortgage rates on this plot, it is clear that 1980 Recession and 1981-1982 Recession have a strong connection to the mortgage rates in this period.
+From Figure 5, we can look at the U.S. national HPI values overtime with periods of rescession represented in the form of vertical line. This in a sense indicates that before great recession of 2007, recession did not had much impact on HPI. Even the great recession doesnot clearly explains the relation between recession and HPI. 
 
-```{r p3_mortgage_recession}
+```{r p3_mortgage_recession, fig.cap="Figure 6"}
 p3_mortgage_recession <- p1_hpi_mort +
   geom_rect(data = recession_dates1, aes(xmin = from, xmax = to, ymin = -Inf, ymax = Inf), alpha = 0.25, fill = "blue") +
   ggtitle("Recession, HPI and Mortgage Rates")
@@ -311,6 +300,10 @@ p3_mortgage_recession <- p1_hpi_mort +
 p3_mortgage_recession
 ```
 
+Adding mortgage rates to the Figure 5, it is clear that 1980 Recession and 1981-1982 Recession have a strong connection to the mortgage rates in this period.
 
+# Conclusion
+
+Thus in the end this analysis tries to answer the primary question we started with and based on the analysis it can said that House Price Index in the U.S. has increased overtime and has mainly remain independent of the external factors like recession and mortgage rates.
 
 # References
