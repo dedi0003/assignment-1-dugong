@@ -15,52 +15,51 @@ output:
 
 # Introduction and motivation
 
-House Price Index (HPI) is a broad measure to understand the movement of the single-family house prices across a designated market. HPI provides housing economists with an improved analytical tool that is useful for estimating changes in the rates of mortgage defaults, prepayments and housing affordability in specific geographic areas. Economists and Fund Managers often use HPI to analyse long term trends in consumer behaviour and financial situation of the country. It is for this exact reason currency investors keep a watch on HPI along with Consumer Price Index (CPI), Gross Domestic Product (GDP) and unemployment figures. Experts say that HPI can predict inflation. With proper lender assistance, HPIs can also help you decide if it’s a good time to purchase a new home. 
+House Price Index (HPI) is a broad measure to understand the movement of the single-family house prices across a designated market. HPI provides housing economists with an improved analytical tool that is useful for estimating changes in the rates of mortgage defaults, prepayments and housing affordability in specific geographic areas. Economists and Fund Managers often use HPI to analyse long term trends in consumer behaviour and financial situation of the country. It is for this exact reason currency investors keep a watch on HPI along with Consumer Price Index (CPI), Gross Domestic Product (GDP) and unemployment figures. Experts say that HPI can predict inflation. With proper lender assistance, HPIs can also help you decide if it’s a good time to purchase a new home.   
 
-The housing market represents about 15 percent to 18 percent of U.S. GDP, which means a weak or strong housing market can have substantial influence on the direction of the overall economy. This makes HPI even more important to track and use in analysis. 
+The housing market represents about 15 percent to 18 percent of U.S. GDP, which means a weak or strong housing market can have substantial influence on the direction of the overall economy. This makes HPI even more important to track and use in analysis.   
 
-The motivation of this report is to analyse the House Price Index in the U.S. overtime and also detailed it down to some prominent states. The report will also analyse the effect of the external factors like recession and mortgage rates on HPI. 
+The motivation of this report is to analyse the House Price Index in the U.S. overtime and also detailed it down to some prominent states. The report will also analyse the effect of the external factors like recession and mortgage rates on HPI.   
 
-At present, the House Price Index is a relatively less known economic indicator which is soon gaining popularity among economists. Although this report is limited to establish HPI’s as an alternative economic factor to understand recession and its relation with mortgage rates, analysing HPI in greater detail will allow for more informative view of the state of an economy and HPI’s relation with other factors like Currency fluctuation and GDP. As the strength of housing market also dictates the state of the workforce involved in this sector, relating HPI with population and workforce data will provide another interesting relation to analyse and predict the state of workforce and income during recessions.
+At present, the House Price Index is a relatively less known economic indicator which is soon gaining popularity among economists. Although this report is limited to establish HPI’s as an alternative economic factor to understand recession and its relation with mortgage rates, analysing HPI in greater detail will allow for more informative view of the state of an economy and HPI’s relation with other factors like Currency fluctuation and GDP. As the strength of housing market also dictates the state of the workforce involved in this sector, relating HPI with population and workforce data will provide another interesting relation to analyse and predict the state of workforce and income during recessions.  
 
 # Data description
 
-House and Mortgage Data consists of three separate data tables from different sources. These tables are:
+In order to perform this analysis a real time data source is used to get an updated information for the HPI values which is also seasonally adjusted along with an updated mortgage rates. In this case it is Freddie Mac. To get information about the prominent recession period in the U.S., web scrapping is used to scrape data from wikipedia.  
 
-1. **House Price Index**: The data for House Price Index (HPI) has been originally taken from ‘Freddie Mac’ website (http://www.freddiemac.com/research/indices/house-price-index.page). The raw data is then further modified to include 26,877 observations and 5 variables. These variables are:  
+### Freddie Mac House Price Index   
 
-**Year**: A date-integer type variable with year information.  
-**Month**: A date-integer type variable with months information.  
-**State**: A character data type variable with US state’s abbreviations.  
-**price_index**: A double data type variable with the calculated values for HPI at state level.  
-**us_avg**: A double data type variable with the calculated values for HPI at national level.  
+In the U.S., the House Price Index is published by the Federal Housing Finance Agency (FHFA), using data supplied by the Federal National Mortgage Association (FNMA), typically known as Fannie Mae, and Federal Home Loan Mortgage Corp. (FHLMC), commonly known as Freddie Mac.   
 
-This dataset has been maintained by Freddie Mac from January’1975 onwards. This particular dataset has data till November’2018 and is a monthly data for every US state with calculated values for HPI at State level & national level. The price_index at state level and national level is calculated using a repeat-transactions methodology. For calculating HPI, Freddie Mac uses a dataset that includes valuation and location data for the combined portfolio of loans that were purchased by either Freddie Mac or Fannie Mae since January 1975. This dataset is updated monthly with new purchases from the two firms.
+Freddie Mac publishes the monthly index values of the Freddie Mac House Price Index (FMHPI) each quarter. Index values are available for the nation, the 50 states and the District of Columbia, and the more than 380 metropolitan statistical areas (MSAs) in the U.S. The FMHPI is constructed using a repeat transactions methodology, which has become a common practice in housing research. The FMHPI is estimated with data including transactions on single-family detached and townhome properties serving as collateral on loans originated between January 1, 1975, and the end of the most recent index month, where the loan has been purchased by Freddie Mac or Fannie Mae.  
 
-2.	**Mortgage Rates**: The data for Mortgage Rates has been taken from Freddie Mac’ website (http://www.freddiemac.com/pmms/). The dataset consists of 2492 observations and 9 variables. These variables are:  
+Repeat transactions indices measure price appreciation while holding constant property type and location, by comparing the price of the same property over two or more transactions. By construction, therefore, the repeat transaction requirement excludes new homes. The change in price of a given property measures the underlying rate of appreciation because basic factors such as physical location, climate, housing type, etc., are constant between transactions.   
 
-**Date**: A date type variable with dates.  
-**Fixed_rate_30_yr**: A double datatype with 30-year fixed rate mortgage in percent  
-**Fees_and_pts_30_yr**: A double datatype with fees and percentage points of the loan amount  
-**Fixed_rate_15_yr**: A double datatype with 15-year fixed rate mortgage in percent  
-**Fees_and_pts_15_yr**: A double datatype with fees and percentage points of the loan amount  
-**Adjustable_rate_5_1_hybrid**: A double datatype with adjustable mortgage rate based on 5-1 hybrid i.e. 5 year fixed, then annual adjustable rate.  
-**Fees_and_pts_5_1_hybrid**: A double datatype with fees and percentage points of the loan amount  
-**Adjustable_margin_5_1_hybrid**: A double datatype variable. This variable represents a full index rate for an ARM with a fixed amount added to the initial index.  
-**Spread_30_yr_fixed_and_5_1_adjustable**: A double datatype with difference between 30-year fixed rate and 5-1 adjustable rate  
+Significant renovation or deterioration to a property may, however, lead to higher or lower appreciation, respectively, than what results from the underlying price change of the property as it existed in the first transaction. The methodology attempts to identify and exclude such outlier properties that may influence the index away from a more accurate estimate of average property appreciation rates.  
 
-This dataset has been maintained by Freddie Mac from April’1971 onwards. Freddie Mac has surveyed lenders across the nation weekly to determine the average 30-year fixed-rate mortgage rate; in 1984, the 1-year ARM was added to the survey and the 15-year fixed-rate mortgage rate was included beginning in 1991. In January 2005, Freddie Mac added a 5/1 hybrid ARM series to the survey. Survey reminder emails are sent out on Mondays and lenders are asked to respond by close of business Wednesday. 
+Further the calculation of HPI also involves appraisal values for some refinance decisions. Refinance adjustment terms are included in the regression specification to account for the possibility that appraisal values might systematically differ from purchase prices. These additional transactions greatly increase the power of estimation, especially at smaller levels of geography.   
 
-3.	**Recession Dates**: The final dataset is a dataset created with information on major recession periods in US like the Great Recession in 2007. These events had some major effects across many industries and markets and are an important factor in analysing the house prices overtime. The information has been scrapped from Wikipedia (https://en.wikipedia.org/wiki/List_of_recessions_in_the_United_States).
-The dataset consists of 14 observations of 7 variables. These variables are:  
+Thus the primary differences between the FMHPI and other indices are the inclusion of some appraisal values used for refinance transactions, the choice of geographic weights, the method for identifying outliers, and the use of statistical smoothing to more efficiently estimate indices at finer geographic levels.   
 
-**Name**: A character datatype variable with recession names.  
-**Period_range**: A character datatype variable defining the range or period of the recession.  
-**Duration_months**: A character datatype variable with recession period in months.  
-**Time_since_previous_recession_months**: A character datatype variable with information about time since previous recession in months.  
-**Peak_unemploy_ment**:  A character datatype variable with information on the peak unemployment in percent.  
-**Gdp_decline_peak_to_trough**: A character datatype variable that defines the GDP decline from peak.  
-**Characteristics**: A character datatype variable that give a description about the recession.  
+The HPI (or FMHPI) SA raw dataset, consists of both state level HPI and national HPI in a xls format. To use it for analysis in R, which is the preferred tool for analysis in this report, the raw data is further cleaned by breaking variable like month into two seperate variables year and month, updating datatypes and removing data with missing year. This dataset has been maintained by Freddie Mac from January’1975 onwards. For this report the data is taken till November’2018.  
+
+### Mortgage Rates:
+
+The second dataset is of Freddie Mac’s Mortgage rates. Mortgage rates are an important factor that can influence the home buyer's decision. Freddie Mac maintains an extensive dataset for mortgage rates consisting of different types of mortgage like ‘Fixed rate 30 year mortgage’ , ‘Fixed rate 15 year mortgage’ and ‘5-1 Hybrid Adjustable rate mortgage’. Analysing mortgage rates for HPI is also important they are the most common type of personal loan held by households. In other words, Buying a home with a mortgage is probably the largest financial transaction you will enter into.   
+
+Mortgage rates are mainly of two types, fixed and adjustable. Fixed rate mortgage is a fixed interest rate loan whereas interest rates changes under defined conditions in adjustable or hybrid loan.  
+
+Fixed-Rate Mortgage:
+The monthly payment remains the same for the life of this loan. The interest rate is locked in and does not change. Loans have a repayment life span of 30 years; shorter lengths of 10, 15 or 20 years are also commonly available. Shorter loans will have larger monthly payments that are offset by lower interest rates and lower overall cost.   
+
+Adjustable-Rate Mortgage (ARM):
+Because the interest rate is not locked in, the monthly payment for this type of loan will change over the life of the loan. ARMs can be attractive if you are planning on staying in your home for only a few years. It is important to consider how often the interest rate will adjust. For example, a five-to-one-year ARM has a fixed rate for five years, then every year the interest rate will adjust for the remainder of the loan period.  
+
+This dataset has been maintained by Freddie Mac from April’1971 onwards. Freddie Mac has surveyed lenders across the nation weekly to determine the average 30-year fixed-rate mortgage rate; in 1984, the 1-year ARM was added to the survey and the 15-year fixed-rate mortgage rate was included beginning in 1991. In January 2005, Freddie Mac added a 5/1 hybrid ARM series to the survey. Survey reminder emails are sent out on Mondays and lenders are asked to respond by close of business Wednesday.  
+
+### Recession: 
+
+The final dataset is a dataset created with information scrapped from wikipedia on major recession periods in US like the Great Recession in 2007. These events had some major effects across many industries and markets and are an important factor in analysing the house prices overtime. Recession can slow down the market, increase unemployment which leads to loss of income and falling wages which ultimately reduces the spending power of potential home buyers.  
 
 # Analysis and findings
 
