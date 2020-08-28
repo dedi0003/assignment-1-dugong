@@ -76,17 +76,72 @@ library(broom)
 library(MASS)
 library(stringr)
 library(kableExtra)
+library(readxl)
+library(janitor)
+library(rvest)
+library(dplyr)
 ```
 
-```{r read-data}
-state_hpi <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-02-05/state_hpi.csv")
-mortgage_rates <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-02-05/mortgage.csv")
-recession_dates <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-02-05/recessions.csv")
-
+```{r state_abbr, cache=TRUE, echo=FALSE}
+# Download file in working directory
+#destfile = "State_and_US_SA.xls"
+#curl::curl_download(url = "http://www.freddiemac.com/fmac-resources/research/docs/State_and_US_SA.xls", 
+#                    destfile = destfile)
 ```
 
-```{r wrangle}
-mortgage_rates <-  mortgage_rates %>%
+### HPI data
+
+```{r HPI-data, warning=FALSE, message=FALSE, echo=FALSE}
+data_hpi <- read_excel("State_and_US_SA.xls", skip = 5) %>% 
+  separate(Month, c("year", "month"), sep = "M") %>% 
+  mutate_at(vars(year, month), as.integer) %>% 
+  filter(!is.na(year)) %>%
+  gather(state, price_index, AK:WY) %>% 
+  rename(us_avg = `United States seasonally adjusted`) %>% 
+  mutate(price_index = as.numeric(price_index))
+
+head(data_hpi)
+```
+
+### Mortgage Data
+
+```{r message=FALSE,warning=FALSE, echo=FALSE}
+data_mortage <- read_excel("historicalweeklydata.xls", skip = 6, sheet = 2,
+                  col_types = "numeric") %>% 
+  set_names(nm = c("date", "fixed_rate_30_yr", "fees_and_pts_30_yr", 
+                   "fixed_rate_15_yr",
+                   "fees_and_pts_15_yr", "adjustable_rate_5_1_hybrid", 
+                   "fees_and_pts_5_1_hybrid", "adjustable_margin_5_1_hybrid", 
+                   "spread_30_yr_and_fixed_5_1_adjustable", "delete")) %>% 
+  mutate(date = as.Date(date, origin = "1899-12-30"))
+
+head(data_mortage)
+```
+
+### Recession Data
+
+```{r read-recession-data, warning=FALSE, message=FALSE, echo=FALSE}
+url <- "https://en.wikipedia.org/wiki/List_of_recessions_in_the_United_States"
+
+df3 <- url %>% 
+  read_html() %>% 
+  html_table() %>% 
+  .[[3]] %>% 
+  janitor::clean_names()
+
+recession_data <- df3 %>% 
+  mutate(duration_months = substring(duration_months, 3),
+         period_range = substring(period_range, 5),
+         time_since_previous_recession_months = substring(time_since_previous_recession_months, 4),
+         period_range = case_when(name == "Great Depression" ~ "Aug 1929-Mar 1933",
+                                  name == "Great Recession" ~ "Dec 2007-June 2009",
+                                  TRUE ~ period_range))
+
+head(recession_data)
+```
+
+```{r wrangle, echo=FALSE}
+mortgage_rates <-  data_mortage %>%
   dplyr::select("date","fixed_rate_30_yr")
 
 mortgage_rates_month <-  mortgage_rates %>%
@@ -95,13 +150,15 @@ mortgage_rates_month <-  mortgage_rates %>%
   group_by(year,month) %>%
   summarise("mortgage rates" = mean(fixed_rate_30_yr))
 
-state_hpi <- state_hpi %>% 
+state_hpi <- data_hpi %>% 
   mutate(date = ymd(year*10000+month*100+1)) 
 
 nation_hpi <- state_hpi %>%
   dplyr::select("date","year","month","us_avg") %>%
   distinct()
+
 ```
+
 
 ## National HPI
 
@@ -117,6 +174,27 @@ hpi_date <- nation_hpi %>%
   ylab("US Average HPI") +
   ggtitle("US Average HPI")
 hpi_date
+```
+
+```{r}
+state_abb <- as.data.frame(state.abb)
+state_abb <- state_abb %>% mutate(region = state.region)
+colnames(state_abb)[1] <- "state"
+state_abb
+
+state_hpi_abb <- merge(x=state_hpi, y=state_abb, by="state", all.x = TRUE)
+state_hpi_abb$region[is.na(state_hpi_abb$region)] <- "South"
+
+
+state_data_hpi <- state_hpi_abb %>% dplyr::select("date", "region", "state", "price_index", "us_avg") %>% group_by(date,region) %>% summarise(price_index = median(price_index))
+
+state_data_hpi %>%
+  ggplot(aes(date, price_index)) +
+  geom_line(color = "red") + 
+  facet_wrap( ~ region) +
+  xlab("Date") +
+  ylab("US Region Average HPI") +
+  ggtitle("US Region wise Average HPI")
 ```
 
 ## Mortgage
