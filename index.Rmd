@@ -7,7 +7,8 @@ author:
   - Yezi He
 date: "`r Sys.Date()`"
 output: 
-  html_document
+  bookdown::html_document2
+bibliography: reference.bib
 ---
 
 [This assignment is for ETC5521 Assignment 1 by Team `r rmarkdown::metadata$team` comprising of `r knitr::combine_words(rmarkdown::metadata$author)`.]{style="color:#006DAE;"}
@@ -305,5 +306,9 @@ Adding mortgage rates to the Figure 5, it is clear that 1980 Recession and 1981-
 # Conclusion
 
 Thus in the end this analysis tries to answer the primary question we started with and based on the analysis it can said that House Price Index in the U.S. has increased overtime and has mainly remain independent of the external factors like recession and mortgage rates.
+
+# Acknowledgments
+The following packages are used to produce this report:
+tidyverse [@tidyverse], lubridate [@lubridate], stringr [@stringr], kableExtra [@kableExtra], readxl [@readxl], rvest [@rvest], janitor [@janitor], dplyr [@dplyr] , plotly [@plotly], MASS[@mass], scales[@scales], broom[@broom]
 
 # References
