@@ -68,7 +68,7 @@ The motivation of this report is to learn about the behavior of House Price Inde
 
 At present, the House Price Index is a relatively less known economic indicator which is soon gaining popularity among economists. Although this report is limited to establish HPI’s as an alternative economic factor to understand recession and its relation with mortgage rates, analyzing HPI in greater detail will allow for more informative view of the state of an economy and HPI’s relation with other factors like Currency fluctuation and GDP. As the strength of housing market also dictates the state of the workforce involved in this sector, relating HPI with population and workforce data will provide another interesting relation to analyse and predict the state of workforce and income during recessions.  
 
-# Data description
+# Data description 
 
 In order to perform this analysis a real time data source is used to get an updated information for the HPI values which is also seasonally adjusted along with an updated mortgage rates. In this case it is Freddie Mac. To get information about the prominent recession period in the U.S., web scrapping is used to scrape data from Wikipedia.  
 
