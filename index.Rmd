@@ -5,13 +5,57 @@ team: Dugong
 author:
   - Abhishek Sinha
   - Yezi He
-date: "`r Sys.Date()`"
+  - Yawen Zhang
+  - Cuiping Wei
 output: 
   bookdown::html_document2
 bibliography: reference.bib
+biblio-style: authoryear-comp
+link-citations: yes
+linestretch: 3
+date: "`r Sys.Date()`"
+output: 
+  bookdown::html_document2: 
+    toc: yes
+    toc_float:
+      collapsed: true
+      number_sections: false
+    theme: paper
 ---
 
 [This assignment is for ETC5521 Assignment 1 by Team `r rmarkdown::metadata$team` comprising of `r knitr::combine_words(rmarkdown::metadata$author)`.]{style="color:#006DAE;"}
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,warning = FALSE,message = FALSE)
+library(tidyverse)
+library(scales)
+library(lubridate)
+library(broom)
+library(MASS)
+library(stringr)
+library(kableExtra)
+library(readxl)
+library(janitor)
+library(rvest)
+library(dplyr)
+library(plotly)
+```
+
+```{r write-data}
+# state_hpi <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-02-05/state_hpi.csv")
+# mortgage_rates <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-02-05/mortgage.csv")
+# recession_dates <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-02-05/recessions.csv")
+
+write_csv(state_hpi, here::here("data", "state_hpi.csv"))
+write_csv(mortgage_rates, here::here("data", "mortgage_rates.csv"))
+write_csv(recession_dates, here::here("data", "recession_dates.csv"))
+```
+
+```{r read-data}
+state_hpi <-readr::read_csv(here::here("data/state_hpi.csv")) 
+mortgage_rates<-readr::read_csv(here::here("data/mortgage_rates.csv")) 
+recession_dates<-readr::read_csv(here::here("data/recession_dates.csv")) 
+```
 
 
 # Introduction and motivation
@@ -68,30 +112,6 @@ For a broad overview of the trend in House Price Index in U.S. we start with loo
 
 In this we want to figure out what factors can affect House Price Index (HPI) and how they affect HPI. We get the final answer by analyzing three questions. The first is the relationship between mortgage rates and HPI. The second question is how the recession affected HPI. The third question is how the HPI value of the state is related to the HPI value of the country.
 
-[FILL] Should include at least one plot or numerical summary for each of your questions, that helps the reader arrive at an answer. You should also write paragraphs describing the methods, summaries and findings. 
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE,warning = FALSE,message = FALSE)
-library(tidyverse)
-library(scales)
-library(lubridate)
-library(broom)
-library(MASS)
-library(stringr)
-library(kableExtra)
-library(readxl)
-library(janitor)
-library(rvest)
-library(dplyr)
-library(plotly)
-```
-
-```{r state_abbr, cache=TRUE, echo=FALSE}
-# Download file in working directory
-#destfile = "State_and_US_SA.xls"
-#curl::curl_download(url = "http://www.freddiemac.com/fmac-resources/research/docs/State_and_US_SA.xls", 
-#                    destfile = destfile)
-```
 
 ### HPI data
 
