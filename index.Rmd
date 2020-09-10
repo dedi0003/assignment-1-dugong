@@ -46,9 +46,9 @@ library(plotly)
 # mortgage_rates <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-02-05/mortgage.csv")
 # recession_dates <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-02-05/recessions.csv")
 
-write_csv(state_hpi, here::here("data", "state_hpi.csv"))
-write_csv(mortgage_rates, here::here("data", "mortgage_rates.csv"))
-write_csv(recession_dates, here::here("data", "recession_dates.csv"))
+# write_csv(state_hpi, here::here("data", "state_hpi.csv"))
+# write_csv(mortgage_rates, here::here("data", "mortgage_rates.csv"))
+# write_csv(recession_dates, here::here("data", "recession_dates.csv"))
 ```
 
 ```{r read-data}
@@ -118,7 +118,7 @@ In this we want to figure out what factors can affect House Price Index (HPI) an
 Below we can look at the HPI dataset consisting of both US average HPI as 'us_avg' and state level HPI as 'price_index'.
 
 ```{r HPI-data, warning=FALSE, message=FALSE, echo=FALSE}
-data_hpi <- read_excel("State_and_US_SA.xls", skip = 5) %>% 
+data_hpi <- read_excel("data/State_and_US_SA.xls", skip = 5) %>% 
   separate(Month, c("year", "month"), sep = "M") %>% 
   mutate_at(vars(year, month), as.integer) %>% 
   filter(!is.na(year)) %>%
@@ -209,27 +209,37 @@ The first sub question we look at is the relation between national HPI and state
 
 ```{r region-wise, fig.cap="Figure 2"}
 state_abb <- as.data.frame(state.abb)
-state_abb <- state_abb %>% mutate(region = state.region)
+state_abb <- state_abb %>% 
+  mutate(region = state.region)
 colnames(state_abb)[1] <- "state"
 state_abb
 
 state_hpi_abb <- merge(x=state_hpi, y=state_abb, by="state", all.x = TRUE)
 state_hpi_abb$region[is.na(state_hpi_abb$region)] <- "South"
 
-
-state_data_hpi <- state_hpi_abb %>% dplyr::select("date", "region", "state", "price_index", "us_avg") %>% group_by(date,region,us_avg) %>% summarise(price_index = median(price_index))
+state_data_hpi <- state_hpi_abb %>% 
+  select("date", "region", "state", "price_index", "us_avg") %>% 
+  group_by(date,region,us_avg) %>% 
+  summarise(price_index = median(price_index)) %>%
+  rename("National_HPI" = "us_avg", "State_HPI" = "price_index")
 
 p1 <- state_data_hpi %>%
   ggplot()+ 
-  geom_line(data=state_data_hpi, aes(x=date, y=price_index), color="red") +
-  geom_line(data=state_data_hpi, aes(x=date, y=us_avg), color="green") + 
+  geom_line(data=state_data_hpi, aes(x=date, y=State_HPI, color="red")) +
+  geom_line(data=state_data_hpi, aes(x=date, y=National_HPI, color="green")) + 
   facet_wrap( ~ region) +
-  xlab("Date") +
-  ylab("US Region Average HPI") +
-  ggtitle("US Region wise Average HPI")
+  xlab("Year") +
+  ylab("HPI") +
+  ggtitle("US Region vs. Average HPI") +
+  scale_colour_discrete(labels = c('National','State')) +
+  guides(color=guide_legend(title=NULL)) +
+  theme_bw()
+p1
 
-ggplotly(p1)
+# ggplotly(p1)
 ```
+
+
 
 From Figure 2, we can look at the four regions across the U.S. and how the HPI values at state level behaves w.r.t national level. We can notice that the West and Northeast regions are relatively on the same path as national HPI. These are the two regions which have states with strong economies and higher population because of the tech industries. States like California in West and New York or Connecticut in Northeast are some examples of that. For Regions like South and North Central which are comparatively smaller economies and less populated we noticed that they also witnessed a gradual increase in HPI but the effect of housing bubble and great recession was less drastic. This shows that the effect of factors like recession and economics varies around states and thus cannot be explain by one single national HPI. 
 
