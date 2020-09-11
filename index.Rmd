@@ -64,6 +64,15 @@ The House Price Index(HPI) is a broad index for calculating the monthly change i
 In recent years, as the U.S. housing market booming, HPI drew increasing attention from housing economists. From 1975 to 2018, the HPI went through ups and downs, especially the Great Depression that started in 2007, which led to the cold winter for the real estate market. What can we find from HPI when it comes to the mortgage rates? What's the story between HPI, mortgage rates, and the recession?   
 It's exciting to explore what interesting economic secrets can HPI, mortgage rates, and the recession tell us?   
 
+## Secondary research questions
+
+- How similar is the change in state HPI with national HPI?  
+- Do lower mortgage rates mean higher HPI? Can the long mortgage rates predict HPI?
+- Can HPI and mortgage rates provide evidence of a sub-prime crisis?  
+- Are HPI more likely to be higher in prosperous or populous cities?   
+- Can we find any house price bubble in the U.S from 1975 to 2018?  
+- Was the annual change for the HPI index similar to the mortgage rates?  
+
 # Data description
 
 
@@ -231,7 +240,7 @@ p_bubble
 ```
 
 
-## Was the annual change in HPI index similar to the annual change in mortgage rates?  
+## Was the annual change for the HPI index similar to the mortgage rates?  
 
 ```{r mort-fixed30}
 mortgage_fix30 <- mortgage_rates %>% 
