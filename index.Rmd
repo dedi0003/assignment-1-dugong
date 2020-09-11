@@ -80,167 +80,21 @@ It's exciting to explore what interesting economic secrets can HPI, mortgage rat
 
 # Analysis and findings
 
-
-## Can HPI and mortgage rates provide evidence of a subprime crisis? 
-
-```{r recession-wrangle}
-# separate the period time to "start" and "end"
-recession_dat <- recession_clean  %>% 
-  separate(period_range, into = c("start", "end"), sep = "–") %>% 
-  mutate(start = as.Date(parse_date_time(start, "%b %Y")), 
-         end = as.Date(parse_date_time(end, "%b %Y"))) 
-
-recession_tab <- recession_dat %>% 
-  select(1:4,6) %>% 
-  kable(caption = "Early recessions and crises") %>% 
-  kable_styling()
-recession_tab
-```
-
+## Was the annual change for the HPI index similar to the mortgage rates?  
 
 ```{r}
 state_hpi <- state_hpi %>% 
   mutate(date = ymd(year*10000+month*100+1)) 
 
 nation_hpi <- state_hpi %>%
-  #mutate(date = ymd(year*10000+month*100+1)) %>% 
   dplyr::select("date","year","month","us_avg") %>%
   distinct()
 
 ```
 
-```{r miss, fig.cap="Missing value for the mortgage rates, only available for fixed 30 years don't have NA"}
-mortgage_rates %>%
-  select(2,4,6) %>% 
-  vis_miss()
-```
+Are the HPI and the mortgage rate rising or falling?  Are their trends consistent? That would be a good start to explore these two economic indices.    
 
-Changes in HPI and mortgage rates are closely related to economic activity. However, is there a correlation with recessions? Analyzing the effect of the recession on HPI and mortgage rates using financial data is outside this report's scope. However, the recession data scripted from Wikipedia can give us insights to look at the behavior of HPI and mortgage rates during the period of recession.    
-
-As a first step, we examined the missing value of the mortgage rate data. From Figure \@ref(fig: miss), we found that the mortgage rates for fixed 15 and adjustable 5-1 Hybrids were completely missing, so we only can use the mortgage rates for fixed 30 at the end.   
-
-```{r state_abb_data}
-# data of 2-letter abbreviations for the state names
-state_abb <- as.data.frame(state.abb)
-state_abb <- state_abb %>% mutate(region = state.region)
-colnames(state_abb)[1] <- "state"
-
-# join the state HPI data
-state_hpi_abb <- merge(x=state_hpi, y=state_abb, by="state", all.x = TRUE)
-state_hpi_abb$region[is.na(state_hpi_abb$region)] <- "South"
-
-# divided HPI data into four regions, choose median represents region HPI
-state_data_hpi <- state_hpi_abb %>% 
-  dplyr::select("date", "region", "state", "price_index", "us_avg") %>% 
-  group_by(date,region,us_avg) %>% 
-  summarise(price_index = median(price_index))
-```
-
-```{r hpi-mort}
-# national HPI
-hpi_mort <- ggplot()+ 
-  geom_line(data=mortgage_rates, 
-            aes(x=date, y=fixed_rate_30_yr*10), 
-            color="red") +
-  geom_line(data=nation_hpi, 
-            aes(x=date, y=us_avg), 
-            color="green")+
-  scale_y_continuous(sec.axis = sec_axis(~ . *0.1, name = "Mortgage Rates"))+
-  xlim(ymd(19750101), NA) +
-  labs(x="Date", y="US Average HPI") +
-  ggtitle("HPI vs. Mortgage rates")
-
-```
-
-```{r nation_recession, fig.cap="The trend for Recession, National HPI and Mortgage rates. The red line represents the mortgage rates, the green line represents HPI, and the shaded blue area represents the duration of the recession."}
-# combine national HPI and recession into one plot
-mortgage_recession <- hpi_mort +
-  geom_rect(data = recession_dat, 
-            aes(xmin = start, xmax = end, ymin = -Inf, ymax = Inf), 
-            alpha = 0.25, 
-            fill = "blue") +
-  ggtitle("Recession, HPI and Mortgage Rates")+
-  theme_light()
-
-mortgage_recession
-
-```
-
-Figure \@ref(fig: nation_recession) shows the trends for the U.S. average HPI and mortgage rates and the period time of recession across time in the U.S. as well. From Figure \@ref(fig: nation_recession), we can find that the HPI kept rising from 1975 to 2006, even as the American economy has experienced many recessions in this period, which may seem strange. It indicates that with the development of the economy, urban expansion, and population increase, people's demand for housing is increasing [@kulish2012urban]. However, the HPI had a significant drop between 2007 and 2009 during the Great Recession. The sub-prime mortgage crisis led to a sustained economic depression, with the unemployment rate reaching 10%, leading to a sharp reduction in demand for houses[@lee2013happens].   
-
-When we turn our attention to the mortgage rates, we can find some different trends from the HPI. Interestingly, the mortgage rates experienced drastic fluctuations during the 1980 Recession and the 1981-1982 Recession, indicating an association between them. Also, the mortgage rates rose slightly and then decreased during the Great Recession from December 2007 to June 2009. From the above analysis, it can be seen that the mortgage rates tend to go through a process of rising and then falling during the economic recession, which was because the government used monetary policy to adjust interest rates and promote economic recovery[@azis2010predicting].   
-
-## Can we find any house price bubble in the U.S from 1975 to 2018?
-
-```{r bubble, fig.cap="Recession and National HPI. The occurrence of the US housing bubble from 1975 to 2018 and the scenarios that may present in the future."}
-# bubble plot
-p_bubble <- state_hpi %>% 
-  ggplot() +
-  geom_line(aes(date, us_avg), 
-            color = "green") +
-  geom_rect(data = recession_dat, 
-            aes(xmin = start, xmax = end, ymin = -Inf, ymax = Inf), 
-            alpha = 0.25, fill = "blue") +
-  annotate("segment", 
-           x=as.Date('2001-02-01'), 
-           xend=as.Date('2012-01-01'), 
-           y=100, yend=100, 
-           colour = "red", 
-           size = 0.6)+
-  annotate("segment", 
-           x=as.Date('2012-01-01'), 
-           xend=as.Date('2023-09-01'), 
-           y=120, yend=120, 
-           colour = "red", 
-           size = 0.6)+
-  annotate("pointrange", 
-           x = as.Date('2006-12-01'), 
-           y = 166, 
-           ymin = 100, ymax = 190, 
-           colour = "red", 
-           size = 0.6)+
-  annotate("pointrange", 
-           x = as.Date('2019-01-01'), 
-           y = 190, 
-           ymin = 120, ymax = 200, 
-           colour = "red", 
-           size = 0.6)+
-  annotate("segment", 
-           x = as.Date('2019-01-01'), 
-           xend=as.Date('2025-09-01'), 
-           y = 192, yend = 100, 
-           colour = "#69b3a2", 
-           size=1, alpha=1, 
-           arrow=arrow())+
-  annotate(geom = "text", 
-           x=as.Date('2025-12-01'), 
-           y=85, 
-           label="Future\nscenario ?", 
-           size = 4, 
-           color = "red")+
-  annotate(geom = "text", 
-           x=as.Date('2006-12-01'), 
-           y=90, 
-           label="Bubble1", 
-           size = 4, 
-           color = "red")+
-  annotate(geom = "text", 
-           x=as.Date('2019-01-01'), 
-           y=110, 
-           label="Bubble2", 
-           size = 4, 
-           color = "red")+
-  ggtitle("Recession, National HPI and Housing Bubble")+
-  xlim(c(ymd(19750101),ymd(20261201))) +
-  ylab("US Average HPI") +
-  xlab("Date") +
-  theme_light()
-
-p_bubble
-```
-
-
-## Was the annual change for the HPI index similar to the mortgage rates?  
+Therefore, we calculated the annual change for HPI  and the mortgage rates from 1975 to 2018. From Figure \@ref(fig: change), we find some interesting phenomenon is that the annual changes for the mortgage rates had been negative for years, and only a few years had been positive. On the contrary, HPI continued to decline from 2007 to 2011, while the annual change ratios rose in the rest years.  That is, the annual trends of the two seem inconsistent, except that they were both negative from 2007 to 2011, and the U.S. was in Great Recession at that time (Figure \@ref(tab: recession-wrangle).    
 
 ```{r mort-fixed30}
 mortgage_fix30 <- mortgage_rates %>% 
@@ -298,6 +152,163 @@ p2<-nation_hpi_change %>%
 
 p1/p2+plot_layout(guides = "collect")
 
+```
+
+
+## Can HPI and mortgage rates provide evidence of a subprime crisis? 
+
+```{r recession-wrangle}
+# separate the period time to "start" and "end"
+recession_dat <- recession_clean  %>% 
+  separate(period_range, into = c("start", "end"), sep = "–") %>% 
+  mutate(start = as.Date(parse_date_time(start, "%b %Y")), 
+         end = as.Date(parse_date_time(end, "%b %Y"))) 
+
+recession_tab <- recession_dat %>% 
+  select(1:4,6) %>% 
+  kable(caption = "Early recessions and crises") %>% 
+  kable_styling()
+recession_tab
+```
+
+```{r miss, fig.cap="Missing value for the mortgage rates, only available for fixed 30 years don't have NA"}
+mortgage_rates %>%
+  select(2,4,6) %>% 
+  vis_miss()
+```
+
+Changes in HPI and mortgage rates are closely related to economic activity. However, is there a correlation with recessions? Analyzing the effect of the recession on HPI and mortgage rates using financial data is outside this report's scope. However, the recession data scripted from Wikipedia can give us insights to look at the behavior of HPI and mortgage rates during the period of recession.    
+
+As a first step, we examined the missing value of the mortgage rate data. From Figure \@ref(fig: miss), we found that the mortgage rates for fixed 15 and adjustable 5-1 Hybrids were completely missing, so we only can use the mortgage rates for fixed 30 at the end.   
+
+```{r state_abb_data}
+# data of 2-letter abbreviations for the state names
+state_abb <- as.data.frame(state.abb)
+state_abb <- state_abb %>% mutate(region = state.region)
+colnames(state_abb)[1] <- "state"
+
+# join the state HPI data
+state_hpi_abb <- merge(x=state_hpi, y=state_abb, by="state", all.x = TRUE)
+state_hpi_abb$region[is.na(state_hpi_abb$region)] <- "South"
+
+# divided HPI data into four regions, choose median represents region HPI
+state_data_hpi <- state_hpi_abb %>% 
+  dplyr::select("date", "region", "state", "price_index", "us_avg") %>% 
+  group_by(date,region,us_avg) %>% 
+  summarise(price_index = median(price_index))
+```
+
+```{r hpi-mort}
+# national HPI
+hpi_mort <- ggplot()+ 
+  geom_line(data=mortgage_rates, 
+            aes(x=date, y=fixed_rate_30_yr*10), 
+            color="#FFAEB9",
+            size = 0.8) +
+  geom_line(data=nation_hpi, 
+            aes(x=date, y=us_avg), 
+            color="#9BCD9B",
+            size = 0.8)+
+  scale_y_continuous(sec.axis = sec_axis(~ . *0.1, name = "Mortgage Rates"))+
+  xlim(ymd(19750101), NA) +
+  labs(x="Date", y="US Average HPI") +
+  ggtitle("HPI vs. Mortgage rates")
+
+```
+
+```{r nation_recession, fig.cap="The trend for Recession, National HPI and Mortgage rates. The red line represents the mortgage rates, the green line represents HPI, and the shaded blue area represents the duration of the recession."}
+# combine national HPI and recession into one plot
+mortgage_recession <- hpi_mort +
+  geom_rect(data = recession_dat, 
+            aes(xmin = start, xmax = end, ymin = -Inf, ymax = Inf), 
+            alpha = 0.25, 
+            fill = "#7AC5CD") +
+  ggtitle("Recession, HPI and Mortgage Rates")+
+  theme_light()
+
+mortgage_recession
+
+```
+
+Figure \@ref(fig: nation_recession) shows the trends for the U.S. average HPI and mortgage rates and the period time of recession across time in the U.S. as well. From Figure \@ref(fig: nation_recession), we can find that the HPI kept rising from 1975 to 2006, even as the American economy has experienced many recessions in this period, which may seem strange. It indicates that with the development of the economy, urban expansion, and population increase, people's demand for housing is increasing [@kulish2012urban]. However, the HPI had a significant drop between 2007 and 2009 during the Great Recession. The sub-prime mortgage crisis led to a sustained economic depression, with the unemployment rate reaching 10%, leading to a sharp reduction in demand for houses[@lee2013happens].   
+
+When we turn our attention to the mortgage rates, we can find some different trends from the HPI. Interestingly, the mortgage rates experienced drastic fluctuations during the 1980 Recession and the 1981-1982 Recession, indicating an association between them. Also, the mortgage rates rose slightly and then decreased during the Great Recession from December 2007 to June 2009. From the above analysis, it can be seen that the mortgage rates tend to go through a process of rising and then falling during the economic recession, which was because the government used monetary policy to adjust interest rates and promote economic recovery[@azis2010predicting].   
+
+## Can we find any house price bubble in the U.S from 1975 to 2018?
+
+As @kindleberger1987bubbles states, a bubble is a surge in asset prices, which is expected to be continuous. However, the booming trend always turns over afterward and causes a sharp decline, which may spark a financial crisis. It's interesting to explore whether there was a bubble in the U.S. housing market from 1975 to 2018. We will provide you some insights from historical trends in HPI.   
+
+Figure \@ref(fig: bubble) shows that the U.S. experienced the housing bubble1 from 2000 to 2012. House prices continued to rise from 2001 and peaked in 2006, and then decline for six years. The housing bubble is the result of multiple factors, including low mortgage rates[@lowrates]. As shown in Figure \@ref(fig: nation_recession), the overall mortgage rate kept a downward trend since 2000 and remained low, which further confirms that low mortgage rates were one of the main factors leading to this housing bubble1 and sub-prime mortgage crisis.  
+However, HPI experienced a continuous increase process again from 2012 to 2018. Also, the mortgage rates kept decreasing further since 2010 and remained below 5. Will the housing bubble2 emerge? Does the blue line in Figure \@ref(fig: bubble) predict the future scenario? We think the housing bubble2 is highly likely to happen.    
+
+We are experiencing the COVID-19 depression in 2020, the peak unemployment rate in the U.S. reached 14.7% in April 2020.  There is no doubt that high unemployment brings lower expected incomes and reduces the demand for housing in the bust[@krivenko2018unemployment], which implies the decline for future HPI and the occurrence of the housing bubble2.    
+
+```{r bubble, fig.cap="Recession and National HPI. The occurrence of the US housing bubble from 1975 to 2018 and the scenarios that may present in the future."}
+# bubble plot
+p_bubble <- state_hpi %>% 
+  ggplot() +
+  geom_line(aes(date, us_avg), 
+            color = "#9BCD9B",
+            size = 1) +
+  geom_rect(data = recession_dat, 
+            aes(xmin = start, xmax = end, ymin = -Inf, ymax = Inf), 
+            alpha = 0.25, fill = "#7AC5CD") +
+  annotate("segment", 
+           x=as.Date('2001-02-01'), 
+           xend=as.Date('2012-01-01'), 
+           y=100, yend=100, 
+           colour = "#FFAEB9", 
+           size = 0.6)+
+  annotate("segment", 
+           x=as.Date('2012-01-01'), 
+           xend=as.Date('2023-09-01'), 
+           y=120, yend=120, 
+           colour = "#FFAEB9", 
+           size = 0.6)+
+  annotate("pointrange", 
+           x = as.Date('2006-12-01'), 
+           y = 166, 
+           ymin = 100, ymax = 190, 
+           colour = "#FFAEB9", 
+           size = 0.6)+
+  annotate("pointrange", 
+           x = as.Date('2019-01-01'), 
+           y = 190, 
+           ymin = 120, ymax = 200, 
+           colour = "#FFAEB9", 
+           size = 0.6)+
+  annotate("segment", 
+           x = as.Date('2019-01-01'), 
+           xend=as.Date('2025-09-01'), 
+           y = 192, yend = 100, 
+           colour = "#69b3a2", 
+           size=1, alpha=1, 
+           arrow=arrow())+
+  annotate(geom = "text", 
+           x=as.Date('2025-06-01'), 
+           y=90, 
+           label="Future scenario?", 
+           size = 4, 
+           color = "red")+
+  annotate(geom = "text", 
+           x=as.Date('2006-12-01'), 
+           y=90, 
+           label="Bubble1", 
+           size = 4, 
+           color = "red")+
+  annotate(geom = "text", 
+           x=as.Date('2019-01-01'), 
+           y=110, 
+           label="Bubble2", 
+           size = 4, 
+           color = "red")+
+  ggtitle("Recession, National HPI and Housing Bubble")+
+  xlim(c(ymd(19750101),ymd(20261201))) +
+  ylab("US Average HPI") +
+  xlab("Date") +
+  theme_light()
+
+p_bubble
 ```
 
 
