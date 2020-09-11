@@ -60,6 +60,9 @@ recession_dates<-readr::read_csv(here::here("data/recession_dates.csv"))
 
 # Introduction and motivation
 
+The House Price Index(HPI) is a broad index for calculating the monthly change in the selling prices of single-family house prices, which provides house price trends at various state and national levels [@index2018federal]. Also, the housing market represents about 15% to 18% of U.S. GDP[@2019national], which means a weak or strong housing market can substantially influence the direction of the overall economy.   
+In recent years, as the U.S. housing market booming, HPI drew increasing attention from housing economists. From 1975 to 2018, the HPI went through ups and downs, especially the Great Depression that started in 2007, which led to the cold winter for the real estate market. What can we find from HPI when it comes to the mortgage rates? What's the story between HPI, mortgage rates, and the recession?   
+It's exciting to explore what interesting economic secrets can HPI, mortgage rates, and the recession tell us?   
 
 # Data description
 
@@ -282,6 +285,9 @@ p2<-nation_hpi_change %>%
 p1/p2+plot_layout(guides = "collect")
 
 ```
+
+
+# Limitations of anaysis
 
 
 # Conclusion
