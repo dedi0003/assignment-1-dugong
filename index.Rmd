@@ -100,13 +100,15 @@ nation_hpi <- state_hpi %>%
 
 ```
 
-
 ```{r miss, fig.cap="Missing value for the mortgage rates, only available for fixed 30 years don't have NA"}
 mortgage_rates %>%
   select(2,4,6) %>% 
   vis_miss()
 ```
 
+Changes in HPI and mortgage rates are closely related to economic activity. However, is there a correlation with recessions? Analyzing the effect of the recession on HPI and mortgage rates using financial data is outside this report's scope. However, the recession data scripted from Wikipedia can give us insights to look at the behavior of HPI and mortgage rates during the period of recession.    
+
+As a first step, we examined the missing value of the mortgage rate data. From Figure \@ref(fig: miss), we found that the mortgage rates for fixed 15 and adjustable 5-1 Hybrids were completely missing, so we only can use the mortgage rates for fixed 30 at the end.   
 
 ```{r state_abb_data}
 # data of 2-letter abbreviations for the state names
@@ -155,6 +157,9 @@ mortgage_recession
 
 ```
 
+Figure \@ref(fig: nation_recession) shows the trends for the U.S. average HPI and mortgage rates and the period time of recession across time in the U.S. as well. From Figure \@ref(fig: nation_recession), we can find that the HPI kept rising from 1975 to 2006, even as the American economy has experienced many recessions in this period, which may seem strange. It indicates that with the development of the economy, urban expansion, and population increase, people's demand for housing is increasing [@kulish2012urban]. However, the HPI had a significant drop between 2007 and 2009 during the Great Recession. The sub-prime mortgage crisis led to a sustained economic depression, with the unemployment rate reaching 10%, leading to a sharp reduction in demand for houses[@lee2013happens].   
+
+When we turn our attention to the mortgage rates, we can find some different trends from the HPI. Interestingly, the mortgage rates experienced drastic fluctuations during the 1980 Recession and the 1981-1982 Recession, indicating an association between them. Also, the mortgage rates rose slightly and then decreased during the Great Recession from December 2007 to June 2009. From the above analysis, it can be seen that the mortgage rates tend to go through a process of rising and then falling during the economic recession, which was because the government used monetary policy to adjust interest rates and promote economic recovery[@azis2010predicting].   
 
 ## Can we find any house price bubble in the U.S from 1975 to 2018?
 
