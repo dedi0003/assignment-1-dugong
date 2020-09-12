@@ -7,8 +7,8 @@ author:
   - Yezi He
   - Yawen Zhang
   - Cuiping Wei
-output: 
-  bookdown::html_document2
+# output: 
+#   bookdown::html_document2
 bibliography: reference.bib
 biblio-style: authoryear-comp
 link-citations: yes
