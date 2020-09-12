@@ -92,11 +92,11 @@ It's exciting to explore what interesting economic secrets can HPI, mortgage rat
 - Can HPI and mortgage rates provide evidence of a sub-prime crisis?  
 - Can we find any house price bubble in the U.S from 1975 to 2018?  
 
+# Data Description
+The data which are used for analyzing in this report are from [GitHub tidytuesday](https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-02-05)[@github] which contains house and mortgage data. There will be three data sets to do the analysis. The HPI and mortgage rate can be found from the Freddie Mace House Price Index [@HPI] and the small list of recession in the USE could be found in Wikipedia[@wiki]. 
 
-# Data Description and Limitations 
-The data which are used for analyzing in this report are from GitHub which contains house and mortgage data. The original source can be found from the Freddie Mace House Price Index at State and National level and Wikipedia. There will be three data sets to do the analysis. 
-
-The first table is related to the House Price Index (HPI) in each state. @HPI is a broad measure of the movement of single-family house prices between January 1975 and the end of the most recent index month. It is covering index values are available for the national, the 50 states and the District of Columbia, and the more than 380 metropolitan statistical areas (MSAs) in the U.S. The whole data structure displays as follows. 
+## State_hpi
+The first table is related to the House Price Index (HPI) in each state. It is covering index values are available for the national, the 50 states and the District of Columbia, and the more than 380 metropolitan statistical areas (MSAs) in the U.S. The following analysis will use the whole data set. 
 
 |Variable    |Class     |Description |
 |:---|:---|:-----------|
@@ -106,8 +106,8 @@ The first table is related to the House Price Index (HPI) in each state. @HPI is
 |price_index |double    |   Calculated House Price Index - average price changes in repeat sales or refinancings at state level         |
 |us_avg      |double    |   Calculated House Price Index - averaged at national level         |
 
-
-The second data set is related to *Freddie Mac’s Mortgage rates*. Mortgage rates are an important factor that can influence the home buyer's decision which refers to homebuyers looking to finance a new home purchase with a mortgage loan. Freddie Mac maintains an extensive data set for mortgage rates consisting of different types of mortgage like ‘Fixed rate 30-year mortgage’, ‘Fixed rate 15-year mortgage’ and ‘5-1 Hybrid Adjustable rate mortgage’. One thing needs to notice that 30-year fixed rate begin in 1971, while the 15-year data goes back in 1991 and the adjustable 5-1 Hybrid begins in 2005. The whole data structure also present as follows. 
+## Mortgage
+The second data set is related to *Freddie Mac’s Mortgage rates*. Mortgage rates are an important factor that can influence the home buyer's decision which refers to homebuyers looking to finance a new home purchase with a mortgage loan. Freddie Mac maintains an extensive data set for mortgage rates consisting of different types of mortgage like ‘Fixed rate 30-year mortgage’, ‘Fixed rate 15-year mortgage’ and ‘5-1 Hybrid Adjustable rate mortgage’. One thing needs to notice that 30-year fixed rate begin in 1971, while the 15-year data goes back in 1991 and the adjustable 5-1 Hybrid begins in 2005. The whole data structure also present as follows. We only use date and fixed-30-yr to do the analysis. 
 
 |Variable                              |Class  |Description |
 |:-----------|:---|:-----------|
@@ -121,8 +121,11 @@ The second data set is related to *Freddie Mac’s Mortgage rates*. Mortgage rat
 |adjustable_margin_5_1_hybrid          |double |      A fixed amount added to the underlying index to establish the fully indexed rate for an ARM.|
 |spread_30_yr_fixed_and_5_1_adjustable |double |      Difference in rate between 30 year fixed and 5-1 adjustable      |
 
+## State.abb
+This data set contains character vector of 2-leter abbreviations for the state names in USA [@state]. 
 
-The final data set concludes all the recession dates and information from Wikipedia in U.S. These periods of recession have a significant impact on the U.S. economy. These events may affect many industries and markets and are an important factor in analyzing the house prices overtime. Recession can slow down the market, increase unemployment which leads to loss of income and falling wages which ultimately reduces the spending power of potential home buyers.  There have been 14 noteworthy recessions throughout U.S. history, including the Great Depression. The brief structure of this data will show as follows. 
+## Recessions
+The final data set concludes all the recession dates and information from Wikipedia in U.S. These periods of recession have a significant impact on the U.S. economy. These events may affect many industries and markets and are an important factor in analyzing the house prices overtime. Recession can slow down the market, increase unemployment which leads to loss of income and falling wages which ultimately reduces the spending power of potential home buyers.  There have been 14 noteworthy recessions throughout U.S. history, including the Great Depression. The brief structure of this data will show as follows. The first five variables will be applied in the following paragraphs. 
 
 |Variable                             |Class     |Description |
 |:-----------|:---|:-----------|
@@ -134,17 +137,18 @@ The final data set concludes all the recession dates and information from Wikipe
 |gdp_decline_peak_to_trough           |character |     GDP decline from peak to trough       |
 |characteristics                      |character |  Paragraph description of the recession          |
 
-Furthermore, there are some limitations regarding these three data sets. In this report, we will use some built in R datasets such as state region and state name. The built in R dataset only contains 50 states of U.S., Alaska state will not include in our analysis. And the map will not present the Alaska state.
 
-
-=======
+# Limitations
+There are some limitations regarding these three data sets. As a first step, we examined the missing value of the mortgage rate data. From Figure \@ref(fig: miss), we found that the mortgage rates for fixed 15 and adjustable 5-1 Hybrids were completely missing, so we only can use the mortgage rates for fixed 30 year at the end.   
 
 ```{r miss, fig.cap="Missing value for the mortgage rates, only available for fixed 30 years don't have NA"}
 mortgage_rates %>%
   select(2,4,6) %>% 
   vis_miss()
 ```
-As a first step, we examined the missing value of the mortgage rate data. From Figure \@ref(fig: miss), we found that the mortgage rates for fixed 15 and adjustable 5-1 Hybrids were completely missing, so we only can use the mortgage rates for fixed 30 at the end.   
+
+Furthermore, the HPI data set is from 1975 to 2018, with no data for the last two years. It has certain influence on the following analysis of this report, especially the inference of real estate bubble will have bias.
+ 
 
 # Exploration Data Analysis
 
