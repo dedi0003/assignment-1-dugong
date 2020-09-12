@@ -315,8 +315,8 @@ statements_gdp <- gdp %>%
   summarise(
     long = mean(range(x)), 
     lat = mean(range(y)), 
-    group = mean(group), 
-    mean = mean(avg)
+    group = mean(group) 
+    # mean = mean(avg)
   )
 
 ggplot(gdp, aes(x = x, y = y, group = group, fill = avg)) + 
@@ -325,7 +325,7 @@ ggplot(gdp, aes(x = x, y = y, group = group, fill = avg)) +
   labs(title = "House Price Index in Each State in USA", x = "Longitude", y = "Latitude") +
   theme_minimal() +
   theme(plot.title = element_text(hjust = 0.5, size = 16)) +
-  # geom_text(data = statements_gdp, aes(x = long, y = lat, lable = region), size = 3) +
+  geom_text(data = statements_gdp, aes(x = long, y = lat, label = region), size = 3) +
   theme_bw()+
   # theme(panel.grid=element_blank(),panel.border=element_blank(),axis.line=element_line(size=1,colour="black"))+
   theme(axis.ticks.y = element_blank(), axis.text.y = element_blank()) +
