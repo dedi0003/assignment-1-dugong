@@ -267,14 +267,14 @@ statements_states <- all_states %>%
     mean = mean(mean)
   )
 
-ggplot(all_states, aes(x = x, y = y, group = group, fill = mean)) + 
+p2 <- ggplot(all_states, aes(x = x, y = y, group = group, fill = mean)) + 
   geom_polygon(color = "white", show.legend = T) +
   scale_fill_gradient(name = "HPI", low = "#F0F2F0", 
                       high = "#000C40", 
                       guide = "colorbar", 
                       na.value = "black",
                       breaks = pretty_breaks(n = 5)) +
-  labs(title = "House Price Index(HPI) in Each State in USA", x = "Longitude", y = "Latitude") +
+  labs(title = "HPI for each State in USA", x = "Longitude", y = "Latitude") +
   theme_minimal() +
   theme(plot.title = element_text(hjust = 0.5, size = 16)) +
   geom_text(data = statements_states, aes(x = long, y = lat, label = state), size = 3) +
@@ -283,6 +283,8 @@ ggplot(all_states, aes(x = x, y = y, group = group, fill = mean)) +
   theme(axis.ticks.x = element_blank(), axis.text.x = element_blank()) +
   xlab(NULL) +
   ylab(NULL)
+
+ggplotly(p2)
 ```
 For a more comprehensive analysis, GDP data is more convincing. In other words, prosperous states could have higher GDP on average. Same as HPI, calculate the average GDP from 1997 to 2019 has some limitations, we choose ten years same as HPI will be more accurate. In Figure \@ref(fig:GDP-map), the most prosperous state is California, but its HPI was not the highest one. In contrast, the State of North Dakota(ND) has reached the highest HPI in the latest decade, but GDP is relatively lower in these states. Therefore, we could not conclude that higher HPI is more likely to be higher in the prosperous state. However, from Figure \@ref(fig:map-HPI) and Figure \@ref(fig:GDP-map), we could infer that the GDP and HPI of the coastal area are relatively higher than other inland regions.   
 
@@ -320,7 +322,7 @@ statements_gdp <- gdp %>%
     mean = mean(mean)
   )
 
-ggplot(gdp, aes(x = x, y = y, group = group, fill = mean)) + 
+p3 <- ggplot(gdp, aes(x = x, y = y, group = group, fill = mean)) + 
   geom_polygon(color = "white", show.legend = T) +
   scale_fill_gradient(name = "GDP", low = "#F4E2D8", high = "#BA5370", guide = "colorbar", na.value = "black", breaks = pretty_breaks(n = 5)) +
   labs(title = "Gross Domestic Product(GDP) in each state", x = "Longitude", y = "Latitude") +
@@ -332,6 +334,8 @@ ggplot(gdp, aes(x = x, y = y, group = group, fill = mean)) +
   theme(axis.ticks.x = element_blank(), axis.text.x = element_blank()) +
   xlab(NULL) +
   ylab(NULL)
+
+ggplotly(p3)
 ```
 
 
@@ -363,15 +367,12 @@ nation_hpi_change <- nation_hpi %>%
 ```
 
 ```{r change, fig.cap="Mortgage annual changes vs. HPI annual changes"}
-p2<-mortgage_fix30 %>% 
+p4<-mortgage_fix30 %>% 
   ggplot(aes(year, ratio)) + 
   geom_bar(aes(fill=factor((ratio>0)+1)),
            stat="identity")+
   scale_x_continuous(breaks = seq(1975,2020,6))+
   ggtitle("Mortgage annual changes")+
-  # scale_fill_discrete(name="Change",
-  #                        breaks=c("1", "2"),
-  #                        labels=c("Down", "Up"))+
   scale_fill_manual("change",
                     breaks=c("1","2"), 
                     labels=c("Down", "Up"),
@@ -379,15 +380,12 @@ p2<-mortgage_fix30 %>%
   guides(fill = guide_legend(reverse=TRUE))+
   theme_light()
 
-p3<-nation_hpi_change %>% 
+p5<-nation_hpi_change %>% 
   ggplot(aes(year, ratio)) + 
   geom_bar(aes(fill=factor((ratio>0)+1)),
            stat="identity") +
   scale_x_continuous(breaks = seq(1975,2020,6))+
   ggtitle("HPI annual changes")+
-  # scale_fill_discrete(name="Change",
-  #                        breaks=c("1", "2"),
-  #                        labels=c("Down", "Up"))+
    scale_fill_manual("change", 
                      breaks=c("1","2"),
                      labels=c("Down", "Up"),
@@ -395,7 +393,7 @@ p3<-nation_hpi_change %>%
   guides(fill = guide_legend(reverse=TRUE))+
   theme_light()
 
-p2/p3+plot_layout(guides = "collect")
+p4/p5+plot_layout(guides = "collect")
 
 ```
 
@@ -406,7 +404,8 @@ Mortgage rates and HPI are two separate entities which are calculated on differe
   
 In the short term, the factors affecting mortgage rate and house price are different. Mortgage rates can indirectly affect home prices. To be specific, the mortgage rate trend to decrease when the economy is low, the market is relatively unhealthy, and wages are declining. A significant factor causing home prices to rise is a shortage of entry-level construction (@price). Since building material is increasing in cost, constrictor more willing to invest the building cost in high-end properties, intense competition for entry-level homes will lead to higher prices.  
   
-In Figure \@ref(fig:hpi-mort), we can notice that the House Price Index increased overtime, surprisingly mortgage rates have come crashing down from 1971 to 2018. It indicates that there is a strong relationship that higher rates will lead to a drop-in home price in the long term. This situation follows a simple economics situation, as the economy improves, people will have more money to buy houses. As people buy homes using mortgages most of the time, this means that financing houses have become more accessible, which indicates that the bank has enough reserves to dish out mortgage loans at such low rates. Then, house demand will become higher, which will eventually lead to housing prices increase. Therefore, in the long term, we could use the changes in mortgage rates to predict HPI. 
+In Figure \@ref(fig:hpi-mort), we can notice that the House Price Index increased overtime, surprisingly mortgage rates have come crashing down from 1971 to 2018. It indicates that there is a strong relationship that higher rates will lead to a drop-in home price in the long term. This situation follows a simple economics situation, as the economy improves, people will have more money to buy houses. As people buy homes using mortgages most of the time, this means that financing houses have become more accessible, which indicates that the bank has enough reserves to dish out mortgage loans at such low rates. Then, house demand will become higher, which will eventually lead to housing prices increase. Therefore, in the long term, we could use the changes in mortgage rates to predict HPI.  
+  
 Figure \@ref(fig:relationship) also could indicate that the correlation is -0.792,  which means the mortgage rates and HPI have strong negative relationships.  
 
 ```{r hpi-mort, fig.cap="The changes between Mortgage rates and HPI"}
@@ -428,7 +427,7 @@ hpi_mort <- ggplot()+
   labs(x="Year", y="US Average HPI") +
   ggtitle("The Changes between Mortgage rates and HPI") 
   
-hpi_mort 
+ggplotly(hpi_mort) 
 ```
 
 
@@ -448,12 +447,12 @@ GGally::ggpairs(HPI_mortgage ,c(2:3))+
                                     fill = NA)) +
   ggtitle("The Relationship between Mortgage Rate and Hpi")
 
-
-# twoord.plot(lx = HPI_mortgage$date, ly = HPI_mortgage$us_avg, rx = HPI_mortgage$date, ry = HPI_mortgage$fixed_rate_30_yr, main = "House Price vs. Mortgage Rate", xlab = "Date", ylab = "Mortgage Rate", rylab = "HPI", type=c('line','line'))
 ```
 
 
 ## Can HPI and mortgage rates provide evidence of a subprime crisis? 
+
+Changes in HPI and mortgage rates are closely related to economic activity. However, is there a correlation with recessions? Analyzing the effect of the recession on HPI and mortgage rates using financial data is outside this report's scope. However, the recession data scripted from Wikipedia can give us insights to look at the behaviour of HPI and mortgage rates during the period of recession.    
 
 ```{r recession-wrangle}
 # separate the period time to "start" and "end"
@@ -480,10 +479,7 @@ recession_tab
 ```
 
 
-
-Changes in HPI and mortgage rates are closely related to economic activity. However, is there a correlation with recessions? Analyzing the effect of the recession on HPI and mortgage rates using financial data is outside this report's scope. However, the recession data scripted from Wikipedia can give us insights to look at the behaviour of HPI and mortgage rates during the period of recession.    
-
-```{r nation_recession, fig.cap="The trend for Recession, National HPI and Mortgage rates. The red line represents the mortgage rates, the green line represents HPI, and the shaded blue area represents the duration of the recession."}
+```{r recplot, fig.cap="The trend for Recession, National HPI and Mortgage rates. The red line represents the mortgage rates, the green line represents HPI, and the shaded blue area represents the duration of the recession."}
 # combine national HPI and recession into one plot
 mortgage_recession <- hpi_mort +
   geom_rect(data = recession_dat, 
@@ -497,7 +493,7 @@ mortgage_recession
 
 ```
 
-Figure \@ref(fig:nation_recession) shows the trends for the U.S. average HPI and mortgage rates and the period time of recession across time in the U.S. as well. From Figure \@ref(fig:nation_recession), we can find that the HPI kept rising from 1975 to 2006, even as the American economy has experienced many recessions in this period, which may seem strange. It indicates that with the development of the economy, urban expansion, and population increase, people's demand for housing is increasing [@kulish2012urban]. However, the HPI had a significant drop between 2007 and 2009 during the Great Recession. The sub-prime mortgage crisis led to a sustained economic depression, with the unemployment rate reaching 10%, leading to a sharp reduction in demand for houses[@lee2013happens].   
+Figure \@ref(fig:recplot) shows the trends for the U.S. average HPI and mortgage rates and the period time of recession across time in the U.S. as well. From Figure \@ref(fig:nation_recession), we can find that the HPI kept rising from 1975 to 2006, even as the American economy has experienced many recessions in this period, which may seem strange. It indicates that with the development of the economy, urban expansion, and population increase, people's demand for housing is increasing [@kulish2012urban]. However, the HPI had a significant drop between 2007 and 2009 during the Great Recession. The sub-prime mortgage crisis led to a sustained economic depression, with the unemployment rate reaching 10%, leading to a sharp reduction in demand for houses[@lee2013happens].   
 
 When we turn our attention to the mortgage rates, we can find some different trends from the HPI. Interestingly, the mortgage rates experienced drastic fluctuations during the 1980 Recession and the 1981-1982 Recession, indicating an association between them. Also, the mortgage rates rose slightly and then decreased during the Great Recession from December 2007 to June 2009. From the above analysis, it can be seen that the mortgage rates tend to go through a process of rising and then falling during the economic recession, which was because the government used monetary policy to adjust interest rates and promote economic recovery[@azis2010predicting].   
 
