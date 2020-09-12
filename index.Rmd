@@ -206,17 +206,45 @@ p1
 # ggplotly(p1)
 ```
 
+
+
 ## Are HPI more likely to be higher in prosperous or populous cities?
-This part aims to answer the question: Are HPI more likely to be higher in prosperous or populous cities? Since the time interval of the original data is extremely long, calculate the average HPI from 1975 to 2018 has some limitations. Therefore, selecting the data for the latest 10 years could answer this question more accurately. The following Figure \@ref(fig:map-HPI) used the shade of color to represent the HPI. Dark red area indicates higher HPI and vice verse. Within the whole area, the darkest state is ND (State of North Dakota) which reached to 180 percent of HPI. Although we could not conclude HPI may be higher in prosperous region, the HPI in western and eastern coastal area is higher than inland area. On the map, the coastal states of U.S is darker than inland areas especially near California and capital region.  
+This part aims to answer the question: Are HPI more likely to be higher in prosperous or populous cities? Since the time interval of the original data is extremely long, calculate the average HPI from 1975 to 2018 has some limitations. Therefore, selecting the data for the latest 10 years could answer this question more accurately. The following Figure \@ref(fig:map-HPI) used the shade of color to represent the HPI. Dark red area indicates higher HPI and vice verse. Within the whole area, the darkest state is ND (State of North Dakota) which reached to 180 percent of HPI. Although we could not conclude HPI may be higher in prosperous region, the HPI in western and eastern coastal area is higher than inland area. On the map, the coastal states of U.S is darker than inland areas especially near California and capital region. 
+
 
 ```{r filter-2008-2018}
 # US map
-states <- map_data("state")
+# states <- map_data("")
 state.abb <- as.data.frame(state.abb)
 state.name <- as_data_frame(state.name)
 USstate <- cbind(state.abb, state.name) %>%
   rename(state = state.abb, full_name = value)
 
+# Average HPI in each state
+# avg_state <- state_hpi %>%
+#   filter(year %in% c("2008","2009","2010","2011","2012", "2013", "2014", "2015", "2016", "2017", "2018")) %>%
+#   group_by(state) %>%
+#   summarise(mean = mean(price_index)) %>%
+#   ungroup()
+
+# join <- avg_state %>%
+#   right_join(USstate, by = "state")
+# join$full_name <- tolower(join$full_name)
+# join <- join %>%
+#   # select(full_name, state, mean) %>%
+#   rename(region = full_name)
+# states <- merge(states, join, by = "region", all.x = T)
+```
+
+
+```{r}
+us_map <- usmap::us_map() %>%
+  rename(region = "abbr")
+us_map
+```
+
+
+```{r}
 # Average HPI in each state
 avg_state <- state_hpi %>%
   filter(year %in% c("2008","2009","2010","2011","2012", "2013", "2014", "2015", "2016", "2017", "2018")) %>%
@@ -224,33 +252,28 @@ avg_state <- state_hpi %>%
   summarise(mean = mean(price_index)) %>%
   ungroup()
 
-join <- avg_state %>%
-  right_join(USstate, by = "state")
-join$full_name <- tolower(join$full_name)
-join <- join %>%
-  # select(full_name, state, mean) %>%
-  rename(region = full_name)
-states <- merge(states, join, by = "region", all.x = T)
+all_states <- avg_state %>%
+  full_join(us_map, by = c("state" = "region"))
+all_states
 ```
 
-
 ```{r map-HPI, fig.cap="The map of HPI in each state"}
-statements <- states %>%
+statements_states <- all_states %>%
   group_by(state) %>%
   summarise(
-    long = mean(range(long)), 
-    lat = mean(range(lat)), 
+    long = mean(range(x)), 
+    lat = mean(range(y)), 
     group = mean(group), 
     mean = mean(mean)
   )
 
-ggplot(states, aes(x = long, y = lat, group = group, fill = mean)) + 
+ggplot(all_states, aes(x = x, y = y, group = group, fill = mean)) + 
   geom_polygon(color = "white", show.legend = T) +
-  scale_fill_gradient(name = "Percent", low = "#FFFBD5", high = "#B20A2C", guide = "colorbar", na.value = "black", breaks = pretty_breaks(n = 5)) +
+  scale_fill_gradient(name = "Percent", low = "white", high = "black", guide = "colorbar", na.value = "black", breaks = pretty_breaks(n = 5)) +
   labs(title = "House Price Index in Each State in USA", x = "Longitude", y = "Latitude") +
   theme_minimal() +
   theme(plot.title = element_text(hjust = 0.5, size = 16)) +
-  geom_text(data = statements, aes(x = long, y = lat, label = state), size = 3) +
+  geom_text(data = statements_states, aes(x = long, y = lat, label = state), size = 3) +
   theme_bw()+
   # theme(panel.grid=element_blank(),panel.border=element_blank(),axis.line=element_line(size=1,colour="black"))+
   theme(axis.ticks.y = element_blank(), axis.text.y = element_blank()) +
@@ -269,6 +292,48 @@ states_gdp_clean <- states_gdp %>%
 gdp_abb <- left_join(states_gdp_clean, USstate, by = c("GeoName" = "full_name")) %>% 
   select(-c(4:8))
 ```
+
+
+```{r}
+avg_gdp <- gdp_abb %>%
+  filter(year %in% c("2008","2009","2010","2011","2012", "2013", "2014", "2015", "2016", "2017", "2018")) %>%
+  filter(GeoName != "United States") %>%
+  group_by(state) %>%
+  summarise(avg = mean(gdp)) %>%
+  ungroup()
+```
+
+```{r}
+gdp <- us_map %>%
+  right_join(avg_gdp, by = c("region" = "state"))
+gdp
+```
+
+```{r}
+statements_gdp <- gdp %>%
+  group_by(region) %>%
+  summarise(
+    long = mean(range(x)), 
+    lat = mean(range(y)), 
+    group = mean(group), 
+    mean = mean(avg)
+  )
+
+ggplot(gdp, aes(x = x, y = y, group = group, fill = avg)) + 
+  geom_polygon(color = "white", show.legend = T) +
+  scale_fill_gradient(name = "Percent", low = "white", high = "blue", guide = "colorbar", na.value = "black", breaks = pretty_breaks(n = 5)) +
+  labs(title = "House Price Index in Each State in USA", x = "Longitude", y = "Latitude") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, size = 16)) +
+  # geom_text(data = statements_gdp, aes(x = long, y = lat, lable = region), size = 3) +
+  theme_bw()+
+  # theme(panel.grid=element_blank(),panel.border=element_blank(),axis.line=element_line(size=1,colour="black"))+
+  theme(axis.ticks.y = element_blank(), axis.text.y = element_blank()) +
+  theme(axis.ticks.x = element_blank(), axis.text.x = element_blank()) +
+  xlab(NULL) +
+  ylab(NULL)
+```
+
 
 ## Was the annual change in HPI index similar to the annual change in mortgage rates?  
 
