@@ -85,15 +85,16 @@ It's exciting to explore what interesting economic secrets can HPI, mortgage rat
 ## Secondary research questions
 
 - How similar is the change in state HPI with national HPI?  
+- Are HPI more likely to be higher in prosperous or populous cities?   
+- Was the annual change for the HPI index similar to the mortgage rates?  
 - Do lower mortgage rates mean higher HPI? Can the long mortgage rates predict HPI?
 - Can HPI and mortgage rates provide evidence of a sub-prime crisis?  
-- Are HPI more likely to be higher in prosperous or populous cities?   
 - Can we find any house price bubble in the U.S from 1975 to 2018?  
-- Was the annual change for the HPI index similar to the mortgage rates?  
+
 
 # Data Description and Limitations 
 The data which are used for analyzing in this report are from GitHub which contains house and mortgage data. The original source can be found from the Freddie Mace House Price Index at State and National level and Wikipedia. There will be three data sets to do the analysis. 
-  
+
 The first table is related to the House Price Index (HPI) in each state. @HPI is a broad measure of the movement of single-family house prices between January 1975 and the end of the most recent index month. It is covering index values are available for the national, the 50 states and the District of Columbia, and the more than 380 metropolitan statistical areas (MSAs) in the U.S. The whole data structure displays as follows. 
 
 |Variable    |Class     |Description |
@@ -134,6 +135,15 @@ The final data set concludes all the recession dates and information from Wikipe
 
 Furthermore, there are some limitations regarding these three data sets. In this report, we will use some built in R datasets such as state region and state name. The built in R dataset only contains 50 states of U.S., Alaska state will not include in our analysis. And the map will not present the Alaska state.
 
+
+=======
+
+```{r miss, fig.cap="Missing value for the mortgage rates, only available for fixed 30 years don't have NA"}
+mortgage_rates %>%
+  select(2,4,6) %>% 
+  vis_miss()
+```
+As a first step, we examined the missing value of the mortgage rate data. From Figure \@ref(fig: miss), we found that the mortgage rates for fixed 15 and adjustable 5-1 Hybrids were completely missing, so we only can use the mortgage rates for fixed 30 at the end.   
 
 # Exploration Data Analysis
 
@@ -191,57 +201,6 @@ p1
 # ggplotly(p1)
 ```
 
-## Do lower mortgage rates mean higher HPI? Can the long mortgage rates predict HPI?
-
-The second sub question looks at the effect of Mortgage rates on HPI. Mortgage rates and HPI are two separate entities which are calculated on different parameters, but their relations can give interesting insights. For our analysis, we focus on the ‘fixed 30 years rate’ mortgage, as this is more popular within US home-buyers’ markets and has offered a completed picture since the mortgage rate begins. 
-  
-In the short term, the factors that affecting mortgage rate and house price are different. Mortgage rates can indirectly affect home prices. To be specific, the mortgage rate trend to decrease when the economics is poor, the market is relative unhealthy and wages are decreasing. A major factor causing home prices to rise is a shortage of entry-level construction (@price). Since building material is rising in cost, constrictor more willing to invest the building cost in high-end properties. Intense competition for entry-level homes will lead to higher prices.
-  
-In Figure \@ref(fig:hpi-mort), we can notice that the House Price Index increased overtime, surprisingly mortgage rates have come crashing down from 1971 to 2018. It indicates that there is a strong relationship that higher rates will lead to a drop-in home price in the long term. This situation follows a simple economics situation, as the economics get better, people have more money to buy houses. As people buy homes using mortgages most of the time, this means that financing houses has become easier. This indicates that the bank has enough reserves to dish out mortgage loans at such low rates. Then, house demand will become higher, which will eventually lead to housing prices increase. Therefore, in the long term, we could use the changes in mortgage rates to predict HPI. 
-Figure \@ref(fig:relationship) also could indicates that the correlation is -0.792, the mortgage rates and HPI have strong negative relationships. 
-
-```{r hpi-mort, fig.cap="The changes between Mortgage rates and HPI"}
-# national HPI
-hpi_mort <- ggplot()+ 
-  geom_line(data=mortgage_rates, 
-            aes(x=date, y=fixed_rate_30_yr*10),
-            color = "#A73737",
-            size = 0.8) +
-  geom_line(data=nation_hpi, 
-            aes(x=date, y=us_avg),
-            color="#9BCD9B", 
-            size = 0.8)+
-  scale_y_continuous(sec.axis = sec_axis(~ . *0.1, name = "Mortgage Rates"))+
-  theme_light()+
-  xlim(ymd(19750101), NA) +
-  labs(x="Date", y="US Average HPI") +
-  ggtitle("The Changes between Mortgage rates and HPI") 
-  
-hpi_mort 
-```
-
-
-```{r relationship, fig.cap="The relationship between HPI and Mortgage rate"}
-mortgage_date <- unite(data = mortgage_rates_month, date, sep = "-", year, month)
-nation_date <- unite(data = nation_hpi, date, sep = "-", year, month)
-
-HPI_mortgage <- mortgage_date %>%
-  full_join(nation_date, by = "date") %>%
-  rename("Mortgage Rate" = fixed_rate_30_yr, "House Pricing Index (HPI)" = us_avg)
-
-GGally::ggpairs(HPI_mortgage ,c(2:3))+
-  theme_bw()+
-  theme(panel.grid.major = element_blank(), 
-        panel.border = element_rect(linetype = "dashed", 
-                                    colour = "#8E9EAB", 
-                                    fill = NA)) +
-  ggtitle("The Relationship between Mortgage Rate and Hpi")
-
-
-# twoord.plot(lx = HPI_mortgage$date, ly = HPI_mortgage$us_avg, rx = HPI_mortgage$date, ry = HPI_mortgage$fixed_rate_30_yr, main = "House Price vs. Mortgage Rate", xlab = "Date", ylab = "Mortgage Rate", rylab = "HPI", type=c('line','line'))
-```
-
-
 ## Are HPI more likely to be higher in prosperous or populous cities?
 This part aims to answer the question: Are HPI more likely to be higher in prosperous or populous cities? Since the time interval of the original data is extremely long, calculate the average HPI from 1975 to 2018 has some limitations. Therefore, selecting the data for the latest 10 years could answer this question more accurately. The following Figure \@ref(fig:map-HPI) used the shade of color to represent the HPI. Dark red area indicates higher HPI and vice verse. Within the whole area, the darkest state is ND (State of North Dakota) which reached to 180 percent of HPI. Although we could not conclude HPI may be higher in prosperous region, the HPI in western and eastern coastal area is higher than inland area. On the map, the coastal states of U.S is darker than inland areas especially near California and capital region. 
 
@@ -295,12 +254,11 @@ ggplot(states, aes(x = long, y = lat, group = group, fill = mean)) +
   ylab(NULL)
 ```
 
-
 ## Was the annual change in HPI index similar to the annual change in mortgage rates?  
 
 Are the HPI and the mortgage rate rising or falling?  Are their trends consistent? That would be a good start to explore these two economic indices.    
 
-Therefore, we calculated the annual change for HPI  and the mortgage rates from 1975 to 2018. From Figure \@ref(fig: change), we find some interesting phenomenon is that the annual changes for the mortgage rates had been negative for years, and only a few years had been positive. On the contrary, HPI continued to decline from 2007 to 2011, while the annual change ratios rose in the rest years.  That is, the annual trends of the two seem inconsistent, except that they were both negative from 2007 to 2011, and the U.S. was in Great Recession at that time (Figure \@ref(tab: recession-wrangle).
+Therefore, we calculated the annual change for HPI  and the mortgage rates from 1975 to 2018. From Figure \@ref(fig: change), we find some interesting phenomenon is that the annual changes for the mortgage rates had been negative for years, and only a few years had been positive. On the contrary, HPI continued to decline from 2007 to 2011, while the annual change ratios rose in the rest years.  That is, the annual trends of the two seem inconsistent, except that they were both negative from 2007 to 2011, and the U.S. was in Great Recession at that time (Figure \@ref(tab: recession-wrangle).  
 
 ```{r mort-fixed30}
 mortgage_fix30 <- mortgage_rates %>% 
@@ -361,6 +319,59 @@ p2/p3+plot_layout(guides = "collect")
 ```
 
 
+## Do lower mortgage rates mean higher HPI? Can the long mortgage rates predict HPI?
+
+The second sub question looks at the effect of Mortgage rates on HPI. Mortgage rates and HPI are two separate entities which are calculated on different parameters, but their relations can give interesting insights. For our analysis, we focus on the ‘fixed 30 years rate’ mortgage, as this is more popular within US home-buyers’ markets and has offered a completed picture since the mortgage rate begins. 
+  
+In the short term, the factors that affecting mortgage rate and house price are different. Mortgage rates can indirectly affect home prices. To be specific, the mortgage rate trend to decrease when the economics is poor, the market is relative unhealthy and wages are decreasing. A major factor causing home prices to rise is a shortage of entry-level construction (@price). Since building material is rising in cost, constrictor more willing to invest the building cost in high-end properties. Intense competition for entry-level homes will lead to higher prices.
+  
+In Figure \@ref(fig:hpi-mort), we can notice that the House Price Index increased overtime, surprisingly mortgage rates have come crashing down from 1971 to 2018. It indicates that there is a strong relationship that higher rates will lead to a drop-in home price in the long term. This situation follows a simple economics situation, as the economics get better, people have more money to buy houses. As people buy homes using mortgages most of the time, this means that financing houses has become easier. This indicates that the bank has enough reserves to dish out mortgage loans at such low rates. Then, house demand will become higher, which will eventually lead to housing prices increase. Therefore, in the long term, we could use the changes in mortgage rates to predict HPI. 
+Figure \@ref(fig:relationship) also could indicates that the correlation is -0.792, the mortgage rates and HPI have strong negative relationships. 
+
+```{r hpi-mort, fig.cap="The changes between Mortgage rates and HPI"}
+# national HPI
+hpi_mort <- ggplot()+ 
+  geom_line(data=mortgage_rates, 
+            aes(x=date, y=fixed_rate_30_yr*10),
+            color = "#A73737",
+            size = 0.8) +
+  geom_line(data=nation_hpi, 
+            aes(x=date, y=us_avg),
+            color="#9BCD9B", 
+            size = 0.8)+
+  annotate("text", x=as.Date("2012-05-01"), y=110, label="HPI", color = "#9BCD9B", size = 4) +
+  annotate("text", x=as.Date("1987-11-27"), y=175, label="Mortgage Rates", color = "#A73737", size = 4) +
+  scale_y_continuous(sec.axis = sec_axis(~ . *0.1, name = "Mortgage Rates"))+
+  theme_light()+
+  xlim(ymd(19750101), NA) +
+  labs(x="Date", y="US Average HPI") +
+  ggtitle("The Changes between Mortgage rates and HPI") 
+  
+hpi_mort 
+```
+
+
+```{r relationship, fig.cap="The relationship between HPI and Mortgage rate"}
+mortgage_date <- unite(data = mortgage_rates_month, date, sep = "-", year, month)
+nation_date <- unite(data = nation_hpi, date, sep = "-", year, month)
+
+HPI_mortgage <- mortgage_date %>%
+  full_join(nation_date, by = "date") %>%
+  rename("Mortgage Rate" = fixed_rate_30_yr, "House Pricing Index (HPI)" = us_avg)
+
+GGally::ggpairs(HPI_mortgage ,c(2:3))+
+  theme_bw()+
+  theme(panel.grid.major = element_blank(), 
+        panel.border = element_rect(linetype = "dashed", 
+                                    colour = "#8E9EAB", 
+                                    fill = NA)) +
+  ggtitle("The Relationship between Mortgage Rate and Hpi")
+
+
+# twoord.plot(lx = HPI_mortgage$date, ly = HPI_mortgage$us_avg, rx = HPI_mortgage$date, ry = HPI_mortgage$fixed_rate_30_yr, main = "House Price vs. Mortgage Rate", xlab = "Date", ylab = "Mortgage Rate", rylab = "HPI", type=c('line','line'))
+```
+
+
 ## Can HPI and mortgage rates provide evidence of a subprime crisis? 
 
 ```{r recession-wrangle}
@@ -377,14 +388,15 @@ recession_tab <- recession_dat %>%
 recession_tab
 ```
 
+
+
+Changes in HPI and mortgage rates are closely related to economic activity. However, is there a correlation with recessions? Analyzing the effect of the recession on HPI and mortgage rates using financial data is outside this report's scope. However, the recession data scripted from Wikipedia can give us insights to look at the behavior of HPI and mortgage rates during the period of recession.    
+
 ```{r miss, fig.cap="Missing value for the mortgage rates, only available for fixed 30 years don't have NA"}
 mortgage_rates %>%
   select(2,4,6) %>% 
   vis_miss()
 ```
-
-Changes in HPI and mortgage rates are closely related to economic activity. However, is there a correlation with recessions? Analyzing the effect of the recession on HPI and mortgage rates using financial data is outside this report's scope. However, the recession data scripted from Wikipedia can give us insights to look at the behavior of HPI and mortgage rates during the period of recession.    
-
 As a first step, we examined the missing value of the mortgage rate data. From Figure \@ref(fig: miss), we found that the mortgage rates for fixed 15 and adjustable 5-1 Hybrids were completely missing, so we only can use the mortgage rates for fixed 30 at the end.   
 
 ```{r nation_recession, fig.cap="The trend for Recession, National HPI and Mortgage rates. The red line represents the mortgage rates, the green line represents HPI, and the shaded blue area represents the duration of the recession."}
