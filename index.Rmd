@@ -124,6 +124,9 @@ The second data set is related to *Freddie Mac’s Mortgage rates*. Mortgage rat
 ## State.abb
 This data set contains character vector of 2-leter abbreviations for the state names in USA [@state]. 
 
+## GDP
+This data set focus on the Gross Domestic Product(GDP) in the whole United State and each state. GDP measures of national income and output for each state economy. We will use GDP data combine with USA map to do the following analysis. 
+
 ## Recessions
 The final data set concludes all the recession dates and information from Wikipedia in U.S. These periods of recession have a significant impact on the U.S. economy. These events may affect many industries and markets and are an important factor in analyzing the house prices overtime. Recession can slow down the market, increase unemployment which leads to loss of income and falling wages which ultimately reduces the spending power of potential home buyers.  There have been 14 noteworthy recessions throughout U.S. history, including the Great Depression. The brief structure of this data will show as follows. The first five variables will be applied in the following paragraphs. 
 
@@ -212,6 +215,7 @@ p1
 This part aims to answer the question: Are HPI more likely to be higher in prosperous or populous cities? Since the time interval of the original data is extremely long, calculate the average HPI from 1975 to 2018 has some limitations. Therefore, selecting the data for the latest 10 years could answer this question more accurately. The following Figure \@ref(fig:map-HPI) used the shade of color to represent the HPI. Dark red area indicates higher HPI and vice verse. Within the whole area, the darkest state is ND (State of North Dakota) which reached to 180 percent of HPI. Although we could not conclude HPI may be higher in prosperous region, the HPI in western and eastern coastal area is higher than inland area. On the map, the coastal states of U.S is darker than inland areas especially near California and capital region. 
 
 
+
 ```{r filter-2008-2018}
 # US map
 # states <- map_data("")
@@ -240,7 +244,6 @@ USstate <- cbind(state.abb, state.name) %>%
 ```{r}
 us_map <- usmap::us_map() %>%
   rename(region = "abbr")
-us_map
 ```
 
 
@@ -254,10 +257,9 @@ avg_state <- state_hpi %>%
 
 all_states <- avg_state %>%
   full_join(us_map, by = c("state" = "region"))
-all_states
 ```
 
-```{r map-HPI, fig.cap="The map of HPI in each state"}
+```{r map-HPI, fig.cap="The map of House Price Index(HPI) in each state"}
 statements_states <- all_states %>%
   group_by(state) %>%
   summarise(
@@ -269,8 +271,8 @@ statements_states <- all_states %>%
 
 ggplot(all_states, aes(x = x, y = y, group = group, fill = mean)) + 
   geom_polygon(color = "white", show.legend = T) +
-  scale_fill_gradient(name = "Percent", low = "white", high = "black", guide = "colorbar", na.value = "black", breaks = pretty_breaks(n = 5)) +
-  labs(title = "House Price Index in Each State in USA", x = "Longitude", y = "Latitude") +
+  scale_fill_gradient(name = "Percent", low = "#F0F2F0", high = "#000C40", guide = "colorbar", na.value = "black", breaks = pretty_breaks(n = 5)) +
+  labs(title = "House Price Index(HPI) in Each State in USA", x = "Longitude", y = "Latitude") +
   theme_minimal() +
   theme(plot.title = element_text(hjust = 0.5, size = 16)) +
   geom_text(data = statements_states, aes(x = long, y = lat, label = state), size = 3) +
@@ -281,7 +283,7 @@ ggplot(all_states, aes(x = x, y = y, group = group, fill = mean)) +
   xlab(NULL) +
   ylab(NULL)
 ```
-
+For a more comprehensive analysis, GDP data is more convincing. In other words, prosperous states could have higher GDP in average. Same as HPI, calculate the average GDP from 1997 to 2019 has some limitations, we choose 10 years same as HPI is more accurate. In Figure \@ref(fig:GDP-map), the most prosperous state is California, but its HPI was not the most highest one. In contrast, State of North Dakota(ND) has reached the highest HPI in the latest decade, but GDP is relative lower in these states. Therefore, we could not conclude that higher HPI is more likely to be higher in the prosperous state. However, from Figure \@ref(fig:map-HPI) and Figure \@ref(fig:GDP-map), we could infer that the GDP and HPI of coastal area is relative higher than other inland regions. 
 
 ```{r}
 states_gdp_clean <- states_gdp %>% 
@@ -299,30 +301,29 @@ avg_gdp <- gdp_abb %>%
   filter(year %in% c("2008","2009","2010","2011","2012", "2013", "2014", "2015", "2016", "2017", "2018")) %>%
   filter(GeoName != "United States") %>%
   group_by(state) %>%
-  summarise(avg = mean(gdp)) %>%
+  summarise(mean = mean(gdp)) %>%
   ungroup()
 ```
 
 ```{r}
 gdp <- us_map %>%
   right_join(avg_gdp, by = c("region" = "state"))
-gdp
 ```
 
-```{r}
+```{r GDP-map, fig.cap="Gross Domestic Product(GDP) in each state"}
 statements_gdp <- gdp %>%
   group_by(region) %>%
   summarise(
     long = mean(range(x)), 
     lat = mean(range(y)), 
-    group = mean(group) 
-    # mean = mean(avg)
+    group = mean(group),
+    mean = mean(mean)
   )
 
-ggplot(gdp, aes(x = x, y = y, group = group, fill = avg)) + 
+ggplot(gdp, aes(x = x, y = y, group = group, fill = mean)) + 
   geom_polygon(color = "white", show.legend = T) +
-  scale_fill_gradient(name = "Percent", low = "white", high = "blue", guide = "colorbar", na.value = "black", breaks = pretty_breaks(n = 5)) +
-  labs(title = "House Price Index in Each State in USA", x = "Longitude", y = "Latitude") +
+  scale_fill_gradient(name = "Percent", low = "#F4E2D8", high = "#BA5370", guide = "colorbar", na.value = "black", breaks = pretty_breaks(n = 5)) +
+  labs(title = "Gross Domestic Product(GDP) in each state", x = "Longitude", y = "Latitude") +
   theme_minimal() +
   theme(plot.title = element_text(hjust = 0.5, size = 16)) +
   geom_text(data = statements_gdp, aes(x = long, y = lat, label = region), size = 3) +
@@ -472,13 +473,6 @@ recession_tab
 
 
 Changes in HPI and mortgage rates are closely related to economic activity. However, is there a correlation with recessions? Analyzing the effect of the recession on HPI and mortgage rates using financial data is outside this report's scope. However, the recession data scripted from Wikipedia can give us insights to look at the behavior of HPI and mortgage rates during the period of recession.    
-
-```{r miss, fig.cap="Missing value for the mortgage rates, only available for fixed 30 years don't have NA"}
-mortgage_rates %>%
-  select(2,4,6) %>% 
-  vis_miss()
-```
-As a first step, we examined the missing value of the mortgage rate data. From Figure \@ref(fig: miss), we found that the mortgage rates for fixed 15 and adjustable 5-1 Hybrids were completely missing, so we only can use the mortgage rates for fixed 30 at the end.   
 
 ```{r nation_recession, fig.cap="The trend for Recession, National HPI and Mortgage rates. The red line represents the mortgage rates, the green line represents HPI, and the shaded blue area represents the duration of the recession."}
 # combine national HPI and recession into one plot
