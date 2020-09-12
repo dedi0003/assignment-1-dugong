@@ -18,7 +18,7 @@ output:
     toc_float:
       collapsed: true
       number_sections: false
-    theme: paper
+    # theme: paper
 ---
 
 [This assignment is for ETC5521 Assignment 1 by Team `r rmarkdown::metadata$team` comprising of `r knitr::combine_words(rmarkdown::metadata$author)`.]{style="color:#006DAE;"}
@@ -64,7 +64,7 @@ This section mainly introduces the data, data sources and data description.
 
 ```{r read-data}
 state_hpi <-readr::read_csv(here::here("data/state_hpi.csv")) 
-mortgage_rates<-readr::read_csv(here::here("data/mortgage_rates.csv")) 
+mortgage_rates <- readr::read_csv(here::here("data/mortgage_rates.csv")) 
 states_gdp <- readr::read_csv(here::here("data/SAGDP1__ALL_AREAS_1997_2019.csv")) 
 recession_dates <- readr::read_csv(here::here("data/recession_dates.csv")) 
 ```
@@ -112,14 +112,35 @@ The second data set is related to *Freddie Mac's Mortgage rates*. Mortgage rates
 |adjustable_margin_5_1_hybrid          |double |      A fixed amount added to the underlying index to establish the fully indexed rate for an ARM.|
 |spread_30_yr_fixed_and_5_1_adjustable |double |      Difference in rate between 30 year fixed and 5-1 adjustable      |
 
+
 ### State abbreviation data
 This data set contains a character vector of 2-letter abbreviations for the state names in the USA [@state]. 
+
+|Variable                              |Class  |Description |
+|:-----------|:---|:-----------|
+|state.abb                             |character |     2-letter for the state names        |
+
 
 ### GDP data
 This data set focus on the Gross Domestic Product(GDP) in the whole United State and each state. GDP measures of national income and output for each state economy. We will use GDP data combine with USA map to do the following analysis. 
 
+|Variable                         |Class     |Description |
+|:-----------|:------|:-----------|
+|GeoFIPS                          |character |            Five-digit Federal Information Processing Standards code |
+|GeoName                          |character |            Geographic Name |
+|Region                           |double |               Region|
+|TableName                        |character |            Table Name|
+|LineCode                         |double |               Line code of each state |
+|IndustryClassification           |character |            Industry Classification |
+|Description                      |character |            Description the meaning of each amount |
+|Unit                             |double |               Unit of measure |
+|Year                             |double |               Amount in each year |
+
+
+
 ### Recessions data
 The final data set concludes all the recession dates and information from Wikipedia in the U.S. These periods of recession have a significant impact on the U.S. economy. These events may affect many industries and markets and are an essential factor in analyzing house prices over time. Recession can slow down the market, increase unemployment which leads to loss of income and falling wages which ultimately reduces the spending power of potential home buyers.  There have been 14 noteworthy recessions throughout U.S. history, including the Great Depression. The brief structure of this data will show as follows. The first five variables will be applied in the following paragraphs. 
+
 
 |Variable                             |Class     |Description |
 |:-----------|:---|:-----------|
