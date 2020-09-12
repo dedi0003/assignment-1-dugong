@@ -55,6 +55,7 @@ library(naniar)
 ```{r read-data}
 state_hpi <-readr::read_csv(here::here("data/state_hpi.csv")) 
 mortgage_rates<-readr::read_csv(here::here("data/mortgage_rates.csv")) 
+states_gdp <- readr::read_csv(here::here("data/SAGDP1__ALL_AREAS_1997_2019.csv")) 
 
 # read and clean recession data, scrap from wiki
 url <- "https://en.wikipedia.org/wiki/List_of_recessions_in_the_United_States"
@@ -202,7 +203,7 @@ p1
 ```
 
 ## Are HPI more likely to be higher in prosperous or populous cities?
-This part aims to answer the question: Are HPI more likely to be higher in prosperous or populous cities? Since the time interval of the original data is extremely long, calculate the average HPI from 1975 to 2018 has some limitations. Therefore, selecting the data for the latest 10 years could answer this question more accurately. The following Figure \@ref(fig:map-HPI) used the shade of color to represent the HPI. Dark red area indicates higher HPI and vice verse. Within the whole area, the darkest state is ND (State of North Dakota) which reached to 180 percent of HPI. Although we could not conclude HPI may be higher in prosperous region, the HPI in western and eastern coastal area is higher than inland area. On the map, the coastal states of U.S is darker than inland areas especially near California and capital region. 
+This part aims to answer the question: Are HPI more likely to be higher in prosperous or populous cities? Since the time interval of the original data is extremely long, calculate the average HPI from 1975 to 2018 has some limitations. Therefore, selecting the data for the latest 10 years could answer this question more accurately. The following Figure \@ref(fig:map-HPI) used the shade of color to represent the HPI. Dark red area indicates higher HPI and vice verse. Within the whole area, the darkest state is ND (State of North Dakota) which reached to 180 percent of HPI. Although we could not conclude HPI may be higher in prosperous region, the HPI in western and eastern coastal area is higher than inland area. On the map, the coastal states of U.S is darker than inland areas especially near California and capital region.  
 
 ```{r filter-2008-2018}
 # US map
@@ -252,6 +253,17 @@ ggplot(states, aes(x = long, y = lat, group = group, fill = mean)) +
   theme(axis.ticks.x = element_blank(), axis.text.x = element_blank()) +
   xlab(NULL) +
   ylab(NULL)
+```
+
+
+```{r}
+states_gdp_clean <- states_gdp %>% 
+  mutate('2018' = as.numeric('2018'),
+         '2019' = as.numeric('2019')) %>%
+  pivot_longer(cols = c(9:31), names_to = "year", values_to = "gdp") 
+
+gdp_abb <- left_join(states_gdp_clean, USstate, by = c("GeoName" = "full_name")) %>% 
+  select(-c(4:8))
 ```
 
 ## Was the annual change in HPI index similar to the annual change in mortgage rates?  
@@ -497,10 +509,23 @@ p_bubble
 
 # Limitations of anaysis
 
+This section mainly introduces three main limitations of this analysis.  
+- The analysis of the housing bubble is extrapolated based on trends in historical HPI data and recessionary data. We cannot guarantee the accuracy of the prediction of bubble 2 and future scenarios, but make reasonable inferences based on the data, and there will will cause deviation in results.
+- 
+
 
 
 # Conclusion
 
+```{r}
+library(usmap)
+library(ggplot2)
+
+plot_usmap(regions = "states") + 
+  labs(title = "US Counties",
+       subtitle = "This is a blank map of the counties of the United States.") + 
+  theme(panel.background = element_rect(color = "black", fill = "lightblue"))
+```
 
 
 # Acknowledgments
