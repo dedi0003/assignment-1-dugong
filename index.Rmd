@@ -285,7 +285,7 @@ statements_states <- all_states %>%
     mean = mean(mean)
   )
 
-p2 <- ggplot(all_states, aes(x = x, y = y, group = group, fill = mean)) + 
+p2 <- ggplot(all_states, aes(x = x, y = y, group = group, fill = mean, label = mean)) + 
   geom_polygon(color = "white", show.legend = T) +
   scale_fill_gradient(name = "HPI", low = "#F0F2F0", 
                       high = "#000C40", 
@@ -302,7 +302,7 @@ p2 <- ggplot(all_states, aes(x = x, y = y, group = group, fill = mean)) +
   xlab(NULL) +
   ylab(NULL)
 
-ggplotly(p2)
+ggplotly(p2, tooltip = c("label"))
 ```
 
 Gross Domestic Product (GDP), which is generally regarded as one of the best indicators to measure the economic condition of a country or region, as @SU states. It is a useful indicator, which can provide valued insights for us to know the economic condition for each state in U.S. And we use GDP in this analysis for measuring the prosperity of each state.  
@@ -342,7 +342,7 @@ statements_gdp <- gdp %>%
     mean = mean(mean)
   )
 
-p3 <- ggplot(gdp, aes(x = x, y = y, group = group, fill = mean)) + 
+p3 <- ggplot(gdp, aes(x = x, y = y, group = group, fill = mean, label = mean)) + 
   geom_polygon(color = "white", show.legend = T) +
   scale_fill_gradient(name = "GDP", low = "#F4E2D8", high = "#BA5370", guide = "colorbar", na.value = "black", breaks = pretty_breaks(n = 5)) +
   labs(title = "Gross Domestic Product(GDP) in each state", x = "Longitude", y = "Latitude") +
@@ -355,7 +355,7 @@ p3 <- ggplot(gdp, aes(x = x, y = y, group = group, fill = mean)) +
   xlab(NULL) +
   ylab(NULL)
 
-ggplotly(p3)
+ggplotly(p3, tooltip = c("label"))
 ```
 
 
