@@ -87,70 +87,73 @@ The primary data which are used for analyzing in this report are from [GitHub ti
 ## Data description 
 
 ### HPI data
-The first table is related to the House Price Index (HPI) in each state. It is covering index values are available for the national, the 50 states and the District of Columbia, and the more than 380 metropolitan statistical areas (MSAs) in the U.S. The following analysis will use the whole data set. 
+The first table \@ref(tab:HPI) is related to the House Price Index (HPI) in each state. It is covering index values are available for the national, the 50 states and the District of Columbia, and the more than 380 metropolitan statistical areas (MSAs) in the U.S. The following analysis will use the whole data set. 
 
-|Variable    |Class     |Description |
-|:---|:---|:-----------|
-|year        |date - integer   |      Year      |
-|month       |date - integer   |    Month        |
-|state       |character |   US State         |
-|price_index |double    |   Calculated House Price Index - average price changes in repeat sales or refinancings at state level         |
-|us_avg      |double    |   Calculated House Price Index - averaged at national level         |
+```{r HPI}
+HPI <- data.frame(Variable = c("year", "month", "state", "price_index", "us_avg"), 
+           Class = c("date - integer", "date - integer", "character", "double", "double"),
+           Description = c("Year", "Month", "US State", "Calculated House Price Index - average price changes in repeat sales or refinancings at state level", "Calculated House Price Index - averaged at national level")) %>%
+  kable(caption = "HPI data set from 1975 to 2018, Source from the Freddie Mace House Price Index") %>%
+  kable_styling()
+HPI
+```
+
+
 
 ### Mortgage data
-The second data set is related to *Freddie Mac's Mortgage rates*. Mortgage rates are an essential factor that can influence the home buyer's decision which refers to homebuyers looking to finance a new home purchase with a mortgage loan. Freddie Mac maintains an extensive data set for mortgage rates consisting of different types of mortgage like 'Fixed rate 30-year mortgage', 'Fixed rate 15-year mortgage' and '5-1 Hybrid Adjustable rate mortgage'. One thing needs to notice that 30-year fixed-rate begin in 1971, while the 15-year data went back in 1991 and the adjustable 5-1 Hybrid started in 2005. The whole data structure also presents as follows. We only use fixed-30-yr this variable to do the analysis.   
+The second data set \@ref(tab:Mortgage) is related to *Freddie Mac's Mortgage rates*. Mortgage rates are an essential factor that can influence the home buyer's decision which refers to homebuyers looking to finance a new home purchase with a mortgage loan. Freddie Mac maintains an extensive data set for mortgage rates consisting of different types of mortgage like 'Fixed rate 30-year mortgage', 'Fixed rate 15-year mortgage' and '5-1 Hybrid Adjustable rate mortgage'. One thing needs to notice that 30-year fixed-rate begin in 1971, while the 15-year data went back in 1991 and the adjustable 5-1 Hybrid started in 2005. The whole data structure also presents as follows. We only use fixed-30-yr this variable to do the analysis.
 
-|Variable                              |Class  |Description |
-|:-----------|:---|:-----------|
-|date                                  |date |     Date       |
-|fixed_rate_30_yr                      |double |     Fixed rate 30 year mortgage (percent)       |
-|fees_and_pts_30_yr                    |double |      Fees and percentage points of the loan amount      |
-|fixed_rate_15_yr                      |double |     Fixed rate 15 year mortgage (percent)       |
-|fees_and_pts_15_yr                    |double |      Fees and percentage points of the loan amount      |
-|adjustable_rate_5_1_hybrid            |double |      5-1 Hybrid Adjustable rate mortgage (5 year fixed, then annual adjustable rate)     |
-|fees_and_pts_5_1_hybrid               |double |     Fees and percentage points of the loan amount       |
-|adjustable_margin_5_1_hybrid          |double |      A fixed amount added to the underlying index to establish the fully indexed rate for an ARM.|
-|spread_30_yr_fixed_and_5_1_adjustable |double |      Difference in rate between 30 year fixed and 5-1 adjustable      |
+
+```{r Mortgage}
+Mortgage <- data.frame(Variable = c("date", "fixed_rate_30_yr", "fees_and_pts_30_yr", "fixed_rate_15_yr", "fees_and_pts_15_yr", "adjustable_rate_5_1_hybrid fixed, then annual adjustable rate", "fees_and_pts_5_1_hybrid", "adjustable_margin_5_1_hybrid to establish the fully indexed rate for an ARM", "spread_30_yr_fixed_and_5_1_adjustabl"), 
+            Class = c("date", "double", "double", "double", "double", "double", "double", "double", "double"),
+            Description = c("Date", "Fixed rate 30 year mortgage (percent)", "Fees and percentage points of the loan amount", "Fixed rate 15 year mortgage (percent)", "Fees and percentage points of the loan amount", "5-1 Hybrid Adjustable rate mortgage (5 year fixed, then annual adjustable rate)", "Fees and percentage points of the loan amount", "A fixed amount added to the underlying index to establish the fully indexed rate for an ARM", "Difference in rate between 30 year fixed and 5-1 adjustable"))
+Mortgage %>%
+  kable(caption = "Mortgage data set from 1971 to 2018, Source from the Freddie Mace House Price Index") %>%
+  kable_styling()
+```
+
 
 
 ### State abbreviation data
-This data set contains a character vector of 2-letter abbreviations for the state names in the USA [@state]. 
+This data set table \@ref(tab:State) contains a character vector of 2-letter abbreviations for the state names in the USA [@state]. 
 
-|Variable                              |Class  |Description |
-|:-----------|:---|:-----------|
-|state.abb                             |character |     2-letter for the state names        |
+```{r State}
+State <- data.frame(Variable = "state.abb", Class = "chararcter", Description = "2-letter for the state names")
+State %>%
+  kable(caption = "State abbreviation data set contains 2-letter abbreviation for the state names in the USA, Source from R package datasets") %>%
+  kable_styling()
+```
+
+
 
 
 ### GDP data
-This data set focus on the Gross Domestic Product(GDP) in the whole United State and each state. GDP measures of national income and output for each state economy. We will use GDP data combine with USA map to do the following analysis. 
+This data set table \@ref(tab:GDP-data) focus on the Gross Domestic Product(GDP) in the whole United State and each state. GDP measures of national income and output for each state economy. We will use GDP data combine with USA map to do the following analysis. 
 
-|Variable                         |Class     |Description |
-|:-----------|:------|:-----------|
-|GeoFIPS                          |character |            Five-digit Federal Information Processing Standards code |
-|GeoName                          |character |            Geographic Name |
-|Region                           |double |               Region|
-|TableName                        |character |            Table Name|
-|LineCode                         |double |               Line code of each state |
-|IndustryClassification           |character |            Industry Classification |
-|Description                      |character |            Description the meaning of each amount |
-|Unit                             |double |               Unit of measure |
-|Year                             |double |               Amount in each year |
+```{r GDP-data}
+GDP <- data.frame(Variable = c("GeoFIPS", "GeoName", "Region", "TableName", "LineCode", "IndustryClassification", "Description", "Unit", "Year"), 
+           Class = c("character", "character", "double", "character", "double", "character", "character", "double", "double"), 
+           Description = c("Five-digit Federal Information Processing Standards code", "Geographic Name", "Region", "Table Name", "Line code of each state", "Industry Classification", "Description the meaning of each amount","Unit of measure", "Amount in each year")) 
+GDP %>%
+  kable(caption = "GDP data set from 1997 to 2019, Source from the U.S. Bureau of Economic Analysis") %>%
+  kable_styling()
+```
 
 
 
 ### Recessions data
-The final data set concludes all the recession dates and information from Wikipedia in the U.S. These periods of recession have a significant impact on the U.S. economy. These events may affect many industries and markets and are an essential factor in analyzing house prices over time. Recession can slow down the market, increase unemployment which leads to loss of income and falling wages which ultimately reduces the spending power of potential home buyers.  There have been 14 noteworthy recessions throughout U.S. history, including the Great Depression. The brief structure of this data will show as follows. The first five variables will be applied in the following paragraphs. 
+The final data set \@ref(tab:Recession) concludes all the recession dates and information from Wikipedia in the U.S. These periods of recession have a significant impact on the U.S. economy. These events may affect many industries and markets and are an essential factor in analyzing house prices over time. Recession can slow down the market, increase unemployment which leads to loss of income and falling wages which ultimately reduces the spending power of potential home buyers.  There have been 14 noteworthy recessions throughout U.S. history, including the Great Depression. The brief structure of this data will show as follows. The first five variables will be applied in the following paragraphs. 
 
+```{r Recession}
+Recessoin <- data.frame(Variable = c("name", "duration_months", "duration_months", "time_since_previous_recession_months", "peak_unemploy_ment", "gdp_decline_peak_to_trough", "characteristics"), 
+           Class = c("character", "character", "character", "character", "character", "character","character"), 
+           Description = c("Recession Name", "Time period range of the recession", "How long the recession lasted", "Time since previous recession in months", "Peak unemployment (percent)", "GDP decline from peak to trough", "Paragraph description of the recession")) 
+Recessoin %>%
+  kable(caption = "Recession data from 1929 to present, Source from Wikipedia") %>%
+  kable_styling()
+```
 
-|Variable                             |Class     |Description |
-|:-----------|:---|:-----------|
-|name                                 |character |    Recession Name        |
-|period_range                         |character |        Time period range of the recession    |
-|duration_months                      |character |      How long the recession lasted      |
-|time_since_previous_recession_months |character |    Time since previous recession in months        |
-|peak_unemploy_ment                   |character |  Peak unemployment (percent)          |
-|gdp_decline_peak_to_trough           |character |     GDP decline from peak to trough       |
-|characteristics                      |character |  Paragraph description of the recession          |
 
 
 ## Limitations of data
