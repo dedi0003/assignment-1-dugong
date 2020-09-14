@@ -78,7 +78,12 @@ recession_clean <- recession_dates %>%
          period_range = case_when(name == "Great Depression" ~ "Aug 1929–Mar 1933",
                                   name == "Great Recession" ~ "Dec 2007–June 2009",
                                   name == "COVID-19 recession" ~ "Feb 2020–present",
-                                  TRUE ~ period_range)) 
+                                  TRUE ~ period_range)) %>% 
+mutate(peak_unemploy_ment = recode(peak_unemploy_ment,
+                                   "5.2%[57](1946)" = "5.2%(1946)",
+                                   "17.8%[50]–\n19.0%(1938)[57]" = "17.8%–19.0%(1938)",
+                                   "21.3%(1932)[50]–  24.9%(1933)[51]"= "21.3%(1932)–24.9%(1933)",
+                                   "10.0%(October 2009)[76]" = "10.0%(October 2009)")) 
 ```
 
 ## Data source
@@ -87,21 +92,24 @@ The primary data which are used for analyzing in this report are from [GitHub ti
 ## Data description 
 
 ### HPI data
-The first table \@ref(tab:HPI) is related to the House Price Index (HPI) in each state. It is covering index values are available for the national, the 50 states and the District of Columbia, and the more than 380 metropolitan statistical areas (MSAs) in the U.S. The following analysis will use the whole data set. 
+Table \@ref(tab:HPI) is related to the House Price Index (HPI) in each state. It is covering index values are available for the national, the 50 states and the District of Columbia, and the more than 380 metropolitan statistical areas (MSAs) in the U.S. The following analysis will use the whole data set. 
 
 ```{r HPI}
 HPI <- data.frame(Variable = c("year", "month", "state", "price_index", "us_avg"), 
            Class = c("date - integer", "date - integer", "character", "double", "double"),
            Description = c("Year", "Month", "US State", "Calculated House Price Index - average price changes in repeat sales or refinancings at state level", "Calculated House Price Index - averaged at national level")) %>%
   kable(caption = "HPI data set from 1975 to 2018, Source from the Freddie Mace House Price Index") %>%
-  kable_styling()
+  kable_styling(bootstrap_options = 
+                  c("striped", "condensed"), 
+                  full_width = F, 
+                  position = "center")
 HPI
 ```
 
 
 
 ### Mortgage data
-The second data set \@ref(tab:Mortgage) is related to *Freddie Mac's Mortgage rates*. Mortgage rates are an essential factor that can influence the home buyer's decision which refers to homebuyers looking to finance a new home purchase with a mortgage loan. Freddie Mac maintains an extensive data set for mortgage rates consisting of different types of mortgage like 'Fixed rate 30-year mortgage', 'Fixed rate 15-year mortgage' and '5-1 Hybrid Adjustable rate mortgage'. One thing needs to notice that 30-year fixed-rate begin in 1971, while the 15-year data went back in 1991 and the adjustable 5-1 Hybrid started in 2005. The whole data structure also presents as follows. We only use fixed-30-yr this variable to do the analysis.
+Table \@ref(tab:Mortgage) is related to *Freddie Mac's Mortgage rates*. Mortgage rates are an essential factor that can influence the home buyer's decision which refers to homebuyers looking to finance a new home purchase with a mortgage loan. Freddie Mac maintains an extensive data set for mortgage rates consisting of different types of mortgage like 'Fixed rate 30-year mortgage', 'Fixed rate 15-year mortgage' and '5-1 Hybrid Adjustable rate mortgage'. One thing needs to notice that 30-year fixed-rate begin in 1971, while the 15-year data went back in 1991 and the adjustable 5-1 Hybrid started in 2005. The whole data structure also presents as follows. We only use fixed-30-yr this variable to do the analysis.
 
 
 ```{r Mortgage}
@@ -110,26 +118,27 @@ Mortgage <- data.frame(Variable = c("date", "fixed_rate_30_yr", "fees_and_pts_30
             Description = c("Date", "Fixed rate 30 year mortgage (percent)", "Fees and percentage points of the loan amount", "Fixed rate 15 year mortgage (percent)", "Fees and percentage points of the loan amount", "5-1 Hybrid Adjustable rate mortgage (5 year fixed, then annual adjustable rate)", "Fees and percentage points of the loan amount", "A fixed amount added to the underlying index to establish the fully indexed rate for an ARM", "Difference in rate between 30 year fixed and 5-1 adjustable"))
 Mortgage %>%
   kable(caption = "Mortgage data set from 1971 to 2018, Source from the Freddie Mace House Price Index") %>%
-  kable_styling()
+  kable_styling(bootstrap_options = 
+                  c("striped", "condensed"), 
+                  full_width = F, 
+                  position = "center") 
 ```
 
-
-
 ### State abbreviation data
-This data set table \@ref(tab:State) contains a character vector of 2-letter abbreviations for the state names in the USA [@state]. 
+Table \@ref(tab:State) contains a character vector of 2-letter abbreviations for the state names in the USA [@state]. 
 
 ```{r State}
 State <- data.frame(Variable = "state.abb", Class = "chararcter", Description = "2-letter for the state names")
 State %>%
   kable(caption = "State abbreviation data set contains 2-letter abbreviation for the state names in the USA, Source from R package datasets") %>%
-  kable_styling()
+  kable_styling(bootstrap_options = 
+                  c("striped", "condensed"), 
+                  full_width = F, 
+                  position = "center") 
 ```
 
-
-
-
 ### GDP data
-This data set table \@ref(tab:GDP-data) focus on the Gross Domestic Product(GDP) in the whole United State and each state. GDP measures of national income and output for each state economy. We will use GDP data combine with USA map to do the following analysis. 
+Table \@ref(tab:GDP-data) focus on the Gross Domestic Product(GDP) in the whole United State and each state. GDP measures of national income and output for each state economy. We will use GDP data combine with USA map to do the following analysis. 
 
 ```{r GDP-data}
 GDP <- data.frame(Variable = c("GeoFIPS", "GeoName", "Region", "TableName", "LineCode", "IndustryClassification", "Description", "Unit", "Year"), 
@@ -137,13 +146,16 @@ GDP <- data.frame(Variable = c("GeoFIPS", "GeoName", "Region", "TableName", "Lin
            Description = c("Five-digit Federal Information Processing Standards code", "Geographic Name", "Region", "Table Name", "Line code of each state", "Industry Classification", "Description the meaning of each amount","Unit of measure", "Amount in each year")) 
 GDP %>%
   kable(caption = "GDP data set from 1997 to 2019, Source from the U.S. Bureau of Economic Analysis") %>%
-  kable_styling()
+  kable_styling(bootstrap_options = 
+                  c("striped", "condensed"), 
+                  full_width = F, 
+                  position = "center") 
 ```
 
 
 
 ### Recessions data
-The final data set \@ref(tab:Recession) concludes all the recession dates and information from Wikipedia in the U.S. These periods of recession have a significant impact on the U.S. economy. These events may affect many industries and markets and are an essential factor in analyzing house prices over time. Recession can slow down the market, increase unemployment which leads to loss of income and falling wages which ultimately reduces the spending power of potential home buyers.  There have been 14 noteworthy recessions throughout U.S. history, including the Great Depression. The brief structure of this data will show as follows. The first five variables will be applied in the following paragraphs. 
+Table \@ref(tab:Recession) concludes all the recession dates and information from Wikipedia in the U.S. These periods of recession have a significant impact on the U.S. economy. These events may affect many industries and markets and are an essential factor in analyzing house prices over time. Recession can slow down the market, increase unemployment which leads to loss of income and falling wages which ultimately reduces the spending power of potential home buyers.  There have been 14 noteworthy recessions throughout U.S. history, including the Great Depression. The brief structure of this data will show as follows. The first five variables will be applied in the following paragraphs. 
 
 ```{r Recession}
 Recessoin <- data.frame(Variable = c("name", "duration_months", "duration_months", "time_since_previous_recession_months", "peak_unemploy_ment", "gdp_decline_peak_to_trough", "characteristics"), 
@@ -151,7 +163,10 @@ Recessoin <- data.frame(Variable = c("name", "duration_months", "duration_months
            Description = c("Recession Name", "Time period range of the recession", "How long the recession lasted", "Time since previous recession in months", "Peak unemployment (percent)", "GDP decline from peak to trough", "Paragraph description of the recession")) 
 Recessoin %>%
   kable(caption = "Recession data from 1929 to present, Source from Wikipedia") %>%
-  kable_styling()
+  kable_styling(bootstrap_options = 
+                  c("striped", "condensed"), 
+                  full_width = F, 
+                  position = "center") 
 ```
 
 
@@ -161,9 +176,9 @@ There are some limitations regarding the above data sets.
 
 As a first step, we examined the missing value of the mortgage rate data. From Figure \@ref(fig:miss), we found that the mortgage rates for fixed 15 and adjustable 5-1 Hybrids were completely missing, so we only can use the mortgage rates for fixed-30-year at the end.   
  
-```{r miss, fig.cap="Missing value for the mortgage rates, only available for fixed 30 years don't have NA"}
+```{r miss, fig.cap="Missing value for the mortgage rates, only fixed-30-years don't have NA. We will only use fixed-30-years in this analysis."}
 mortgage_rates %>%
-  select(2,4,6) %>% 
+  select(6,4,2) %>% 
   vis_miss()
 ```
 
@@ -195,7 +210,7 @@ nation_hpi <- state_hpi %>%
 
 ```
 
-```{r region-wise, fig.cap="Compare US Four Regions with the Natinal Level"}
+```{r region-wise, fig.cap="Comparing HPI for U.S. four regions(Northeast, South, North Central, West) with the Natinal Level by line chart. Green line represents state HPI, and red line represents national HPI."}
 # data of 2-letter abbreviations for the state names
 state_abb <- as.data.frame(state.abb)
 state_abb <- state_abb %>% mutate(region = state.region)
@@ -214,8 +229,8 @@ state_data_hpi <- state_hpi_abb %>%
 
 p1 <- state_data_hpi %>%
   ggplot()+ 
-  geom_line(data=state_data_hpi, aes(x=date, y=State_HPI, color="red")) +
-  geom_line(data=state_data_hpi, aes(x=date, y=National_HPI, color="green")) + 
+  geom_line(data=state_data_hpi, aes(x=date, y=State_HPI, color="State")) +
+  geom_line(data=state_data_hpi, aes(x=date, y=National_HPI, color="Nation")) + 
   facet_wrap( ~ region) +
   xlab("Year") +
   ylab("HPI") +
@@ -260,7 +275,7 @@ all_states <- avg_state %>%
   full_join(us_map, by = c("state" = "region"))
 ```
 
-```{r map-HPI, fig.cap="The map of House Price Index(HPI) in each state"}
+```{r map-HPI, fig.cap="The map of average HPI from 2008 to 2018 for each state in USA. The darker the color, the higher the HPI. "}
 statements_states <- all_states %>%
   group_by(state) %>%
   summarise(
@@ -289,7 +304,9 @@ p2 <- ggplot(all_states, aes(x = x, y = y, group = group, fill = mean)) +
 
 ggplotly(p2)
 ```
-For a more comprehensive analysis, GDP data is more convincing. In other words, prosperous states could have higher GDP on average. Same as HPI, calculate the average GDP from 1997 to 2019 has some limitations, we choose ten years same as HPI will be more accurate. In Figure \@ref(fig:GDP-map), the most prosperous state is California, but its HPI was not the highest one. In contrast, the State of North Dakota(ND) has reached the highest HPI in the latest decade, but GDP is relatively lower in these states. Therefore, we could not conclude that higher HPI is more likely to be higher in the prosperous state. However, from Figure \@ref(fig:map-HPI) and Figure \@ref(fig:GDP-map), we could infer that the GDP and HPI of the coastal area are relatively higher than other inland regions.   
+
+Gross Domestic Product (GDP), which is generally regarded as one of the best indicators to measure the economic condition of a country or region, as @SU states. It is a useful indicator, which can provide valued insights for us to know the economic condition for each state in U.S. And we use GDP in this analysis for measuring the prosperity of each state.  
+In other words, prosperous states could have higher GDP on average. Same as HPI, calculate the average GDP from 1997 to 2019 has some limitations, we choose ten years same as HPI will be more accurate. In Figure \@ref(fig:GDP-map), the most prosperous state is California, but its HPI was not the highest one. In contrast, the State of North Dakota(ND) has reached the highest HPI in the latest decade, but GDP is relatively lower in these states. Therefore, we could not conclude that higher HPI is more likely to be higher in the prosperous state. However, from Figure \@ref(fig:map-HPI) and Figure \@ref(fig:GDP-map), we could infer that the GDP and HPI of the coastal area are relatively higher than other inland regions.   
 
 ```{r gdp-data}
 states_gdp_clean <- states_gdp %>% 
@@ -315,7 +332,7 @@ gdp <- us_map %>%
   right_join(avg_gdp, by = c("region" = "state"))
 ```
 
-```{r GDP-map, fig.cap="Gross Domestic Product(GDP) in each state"}
+```{r GDP-map, fig.cap="The map of average GDP from 2008 to 2018 for each state in USA. The darker the color, the higher the GDP."}
 statements_gdp <- gdp %>%
   group_by(region) %>%
   summarise(
@@ -369,7 +386,7 @@ nation_hpi_change <- nation_hpi %>%
   
 ```
 
-```{r change, fig.cap="Mortgage annual changes vs. HPI annual changes"}
+```{r change, fig.cap="The annual change for Mortgage annual changes and HPI annual changes from 1975 to 2018 by line chart, and comparing the trend between them."}
 p4<-mortgage_fix30 %>% 
   ggplot(aes(year, ratio)) + 
   geom_bar(aes(fill=factor((ratio>0)+1)),
@@ -411,7 +428,7 @@ In Figure \@ref(fig:hpi-mort), we can notice that the House Price Index increase
   
 Figure \@ref(fig:relationship) also could indicate that the correlation is -0.792,  which means the mortgage rates and HPI have strong negative relationships.  
 
-```{r hpi-mort, fig.cap="The changes between Mortgage rates and HPI"}
+```{r hpi-mort, fig.cap="Comparing the time series trend for Mortgage rates and HPI from 1975 to 2018 by line chart. Green line represents HPI, and red line represents the mortgage rates. The mortgage rates shows a downward trend, while HPI shows an upward trend."}
 # national HPI
 hpi_mort <- ggplot()+ 
   geom_line(data=mortgage_rates, 
@@ -434,7 +451,7 @@ ggplotly(hpi_mort)
 ```
 
 
-```{r relationship, fig.cap="The relationship between HPI and Mortgage rate"}
+```{r relationship, fig.cap="The plot for he relationship between HPI and Mortgage rate. The plot shows HPI and Mprtgage rate has a strong correlation."}
 mortgage_date <- unite(data = mortgage_rates_month, date, sep = "-", year, month)
 nation_date <- unite(data = nation_hpi, date, sep = "-", year, month)
 
@@ -467,7 +484,7 @@ recession_dat <- recession_clean  %>%
 
 recession_tab <- recession_dat %>% 
   select(1:3, "peak unemployment rate" = peak_unemploy_ment) %>% 
-  kable(caption = "Recessions and crises in U.S.") %>% 
+  kable(caption = "Recessions and crises from 1929 to present in U.S.") %>% 
   kable_styling(bootstrap_options = 
                   c("striped", "condensed"), 
                   full_width = F, 
@@ -482,7 +499,7 @@ recession_tab
 ```
 
 
-```{r recplot, fig.cap="The trend for Recession, National HPI and Mortgage rates. The red line represents the mortgage rates, the green line represents HPI, and the shaded blue area represents the duration of the recession."}
+```{r recplot, fig.cap="The line chart for Recession, National HPI and Mortgage rates. The red line represents the mortgage rates, the green line represents HPI, and the shaded blue area represents the duration of the recession."}
 # combine national HPI and recession into one plot
 mortgage_recession <- hpi_mort +
   geom_rect(data = recession_dat, 
@@ -510,7 +527,7 @@ However, HPI experienced a continuous increase process again from 2012 to 2018. 
 
 We are experiencing the COVID-19 depression in 2020, the peak unemployment rate in the U.S. reached 14.7% in April 2020.  There is no doubt that high unemployment brings lower expected incomes and reduces the demand for housing in the bust[@krivenko2018unemployment], which implies the decline for future HPI and the occurrence of the housing bubble2.    
 
-```{r bubble, fig.cap="Recession and National HPI. The occurrence of the US housing bubble from 1975 to 2018 and the scenarios that may present in the future."}
+```{r bubble, fig.cap="The line chart fot Recession and National HPI. The occurrence of the US housing bubble from 1975 to 2018 and the scenarios that may present in the future."}
 # bubble plot
 p_bubble <- state_hpi %>% 
   ggplot() +
